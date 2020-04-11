@@ -1,6 +1,6 @@
 {
   "name": "efememdb",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Easy, Fast and Efficient MEMory DataBase",
   "main": "index.js",
   "scripts": {
