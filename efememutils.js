@@ -2,7 +2,7 @@
 /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 efememutils.js
 
-Set of usefull functions used for diverse purposes on Efemem Database
+Set of usefull functions used for diverse purposes on Efemem NoSQL Database
 Version 1.0.0
 
 Created by Rafael Hernamperez and released under the terms of the ISC License:
@@ -44,14 +44,14 @@ const validateEntity = (entity, length, regexp) => {
   if (typeof entity != "string")
     return {
       ok: false,
-      msg: `'${entity}' name must be a string`
+      msg: `'${entity}' name must be a string`,
     };
 
   // Check if the entity length is correct
   if (entity.length > length)
     return {
       ok: false,
-      msg: `'${entity}' name is longer than ${length} characters`
+      msg: `'${entity}' name is longer than ${length} characters`,
     };
 
   // Chek if the first character is alphapbetical
@@ -60,20 +60,20 @@ const validateEntity = (entity, length, regexp) => {
   if (!regex.test(entity))
     return {
       ok: false,
-      msg: `'${entity}' name is incorrect. First character must be alphabetical`
+      msg: `'${entity}' name is incorrect. First character must be alphabetical`,
     };
 
   // Check regular expression validation
   if (regexp.test(entity))
     return {
       ok: false,
-      msg: `'${entity}' name is incorrect. Please check the use of possible ilegal special characters`
+      msg: `'${entity}' name is incorrect. Please check the use of possible ilegal special characters`,
     };
 
   // Validation is ok
   return {
     ok: true,
-    msg: `'${entity}' name is correct`
+    msg: `'${entity}' name is correct`,
   };
 }; // validateEntity() function
 
@@ -108,7 +108,7 @@ const getLocalNow = () => {
  * @param {int} seconds => Number of seconds to add to current time
  * @returns {Date} => Current time increased by seconds parameter
  */
-const getDueTime = seconds => {
+const getDueTime = (seconds) => {
   if (seconds > 0)
     //return new Date(new Date().getTime() + (seconds * 1000)).toISOString();
     return new Date(getLocalNow().getTime() + seconds * 1000).toISOString();
@@ -120,7 +120,7 @@ const getDueTime = seconds => {
  * @param {hrtime} startTime => Previous moment using process.hrtime
  * @returns {string} => Difference between startTime and current time (9s 9.999ms 9 nanosecons)
  */
-const finishTime = startTime => {
+const finishTime = (startTime) => {
   const diff = process.hrtime(startTime);
   const seconds = diff[0];
   const nano = diff[1];
@@ -134,7 +134,7 @@ const finishTime = startTime => {
  * @param {any} value => Value to be calculated
  * @returns {number} => Size of value. -1 if its type is not native
  */
-const getNativeSize = value => {
+const getNativeSize = (value) => {
   const valueType = typeof value;
 
   if (valueType == "string") return value.length * 2;
@@ -151,7 +151,7 @@ const getNativeSize = value => {
  * @param {any} value => Value to be measured
  * @returns {number} => Size of value in bytes
  */
-const getValueSize = value => {
+const getValueSize = (value) => {
   let items = [value]; // decomponse the value
   let size = 0;
 
@@ -216,5 +216,5 @@ module.exports = {
   finishTime,
   getNativeSize,
   getValueSize,
-  getRandomKey
+  getRandomKey,
 };

@@ -1,6 +1,6 @@
 # EFEMem DB
 
-**Easy, Fast and Effective MEMory DataBase**
+**Easy, Fast and Effective MEMory NoSQL DataBase**
 
 **version 1.0.0**
 

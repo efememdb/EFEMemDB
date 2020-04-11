@@ -2,7 +2,7 @@
 /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 examples.js
 
-EFEMem DataBase examples
+EFEMem NoSQL DataBase examples
 Version 1.0.0
 
 Created by Rafael Hernamperez and released under the terms of the ISC License:
@@ -13,7 +13,7 @@ Copyright 2020 Rafael Hernamperez
 
 \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 */
-const { efemem } = require("./efememdb");
+const { efemem } = require("efememdb");
 
 // Data assignation
 // Integer value

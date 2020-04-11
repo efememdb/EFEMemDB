@@ -1,6 +1,6 @@
 # EFEMem DB
 
-**Easy, Fast and Effective MEMory DataBase**
+**Easy, Fast and Effective MEMory NoSQL DataBase**
 
 **version 1.0.0**
 
@@ -24,6 +24,16 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 **EFEMem DB** is an ultra-light, fast and effective NoSQL database, based on key-value pairs, running enterely on RAM memory.
 
 With a few and very easy commands, you can take the control of your data.
+
+
+
+`const { efememdb } = require('efememdb');`
+
+`let result = efememdb.set("hello", "world");`
+
+`result = efememdb.get("hello");`
+
+
 
 
 
@@ -63,7 +73,19 @@ You also can use **EFEMem DB** in your web applications, without need to call re
 
 ### Installation
 
-You can install **EFEMem DB** easily, copying the directory in your NodeJS project. Then, you can import the `efemem` object with this line:
+The recommended installation of EFEMem DB is via `npm`:
+
+`npm install efememdb -save`
+
+
+
+After that, you can use **EFEMem DB** in your code importing the `efemem` object:
+
+`const { efememdb } = require('efememdb');`
+
+
+
+You can install manually **EFEMem DB** easily, copying the directory in your NodeJS project. Then, you can import the `efemem` object with this line:
 
 `const { efemem } = require('install_path/efememdb.js');`
 

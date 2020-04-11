@@ -1,6 +1,6 @@
 # EFEMem DB
 
-**Easy, Fast and Effective MEMory DataBase**
+**Easy, Fast and Effective MEMory NoSQL DataBase**
 
 **version 1.0.0**
 
@@ -24,6 +24,16 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 **EFEMem DB** is an ultra-light, fast and effective NoSQL database, based on key-value pairs, running enterely on RAM memory.
 
 With a few and very easy commands, you can take the control of your data.
+
+
+
+`const { efememdb } = require('efememdb');`
+
+`let result = efememdb.set("hello", "world");`
+
+`result = efememdb.get("hello");`
+
+
 
 
 
@@ -63,7 +73,19 @@ You also can use **EFEMem DB** in your web applications, without need to call re
 
 ### Installation
 
-You can install **EFEMem DB** easily, copying the directory in your NodeJS project. Then, you can import the `efemem` object with this line:
+The recommended installation of EFEMem DB is via `npm`:
+
+`npm install efememdb -save`
+
+
+
+After that, you can use **EFEMem DB** in your code importing the `efemem` object:
+
+`const { efememdb } = require('efememdb');`
+
+
+
+You can install manually **EFEMem DB** easily, copying the directory in your NodeJS project. Then, you can import the `efemem` object with this line:
 
 `const { efemem } = require('install_path/efememdb.js');`
 
@@ -115,7 +137,7 @@ Each value is associated to an unique key. You can use different types of values
 
 ### Define keys and values
 
-You can define a key using the `set()` command:
+You can define a key using this command:
 
 `efemem.set("language:en", "English");`
 
@@ -123,7 +145,7 @@ You can define a key using the `set()` command:
 
 
 
-By default, **EFEMem DB** uses the space name `'public'` in order to organize the storage of the keys.
+By default, **EFEMem DB** uses the space name `'public'` in order to store the keys.
 
 A good practice is to organize the keys under an explicit space name:
 
@@ -145,11 +167,9 @@ Remember: you can use complex data as value:
 
 ### Retrieve a key and value
 
-You can retrieve a value through its key, using the `get()` command:
+You can retrieve a value through its key, using the following command:
 
 `efemem.get("language:en", "languages");`
-
-
 
 The space name is optional, but is highly recommend its usage. If you don't use a space name, **EFEMem DB** assumes the `'public'` space name by default.
 
@@ -157,11 +177,9 @@ The space name is optional, but is highly recommend its usage. If you don't use 
 
 ### Delete a key and value
 
-You can remove a value through its key, using the `delete()` command:
+You can remove a value through its key, using the following command:
 
 `efemem.delete("language:en", "languages");`
-
-
 
 The space name is optional, but is highly recommend its usage. If you don't use a space name, **EFEMem DB** assumes the `'public'` space name by default.
 
@@ -171,7 +189,7 @@ The space name is optional, but is highly recommend its usage. If you don't use 
 
 When you are using extensively the database, you will have many keys. Using space names will facilitate you the organization and the search of the keys.
 
-If you want to remember the space names that you are using, simply execute the `spaces()` command:
+If you want to remember the space names that you are using, simply execute the following command:
 
 `efemem.spaces();`
 
@@ -179,7 +197,7 @@ If you want to remember the space names that you are using, simply execute the `
 
 ### List of keys
 
-You can list all the keys using any of the following commands:
+You can list all the keys using any of the following command:
 
 `efemem.keys();`
 
@@ -220,7 +238,9 @@ You can use patterns like these:
 
 The same concept can be applied to the space names, or for both. 
 
-For example: some space names are used in order to identify courses for each country (among many others). You will have the following space names: `"coursesUK"`, `"coursesGB"`, `"coursesIT"`, `"coursesFR"` and `"coursesES"`. The following command will retrieve all the keys for the course ID 002 in all countries:
+For example: imagine you have space names that identify courses for each country (among many others). You will have the following space names: `"coursesUK"`, `"coursesGB"`, `"coursesIT"`, `"coursesFR"` and `"coursesES"`.
+
+The following command will retrieve all the keys for the course ID 002 in all countries:
 
 `efemem.keys("course:002", "courses");`
 
@@ -231,8 +251,6 @@ For example: some space names are used in order to identify courses for each cou
 You can retrieve the values filtering the keys in the same way you can do with the `keys()` command. 
 
 The `keys()` command and the `values()` command works in the same way. The difference is the result. `keys()` command returns the list of keys and space names, meanwhile `values()` command returns the full data about the value, key and space.
-
-
 
 **Examples:**
 
