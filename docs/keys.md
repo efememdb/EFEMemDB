@@ -1,12 +1,12 @@
 # Keys
 
-**EFEMem database** storage is based on key and value pairs. Every value is associated to an unique key.
+**EFEMem Database** storage is based on key and value pairs. Every value is associated to an unique key.
 
 A key is an unique name that identifies exclusively a value. If you use the same key for two values, only a key-value is available (the last one).
 
 **EFEMem database** provides you the space name feature. You can group your keys into spaces names for an easy and efficient organization. Also, the space name defines an scope of keys, which means that you can define repetated key names, but only unique key names on each space name. For example, you can define a key named **maxValue** into the space **config**, and other key also named **maximumValue** into the space **sales**.
 
-You can locate and access quickly to the values using the key names. **EFEMem database** allows you to filter and find easily the keys through efficient commands.
+You can locate and access quickly to the values using the key names. **EFEMem Database** allows you to filter and find easily the keys through efficient commands.
 
 
 

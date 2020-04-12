@@ -1,8 +1,10 @@
 # EFEMem DB
 
-**Easy, Fast and Effective MEMory NoSQL DataBase**
+**Easy, Fast and Efficient MEMory NoSQL DataBase**
 
-**version 1.0.0**
+**version 1.0.4**
+
+<img src="EFEMemDB-icon.png" alt="EFEMem NoSQL Database" style="zoom:50%;" />
 
 *Created by Rafael Hernamperez and released under the terms of the ISC License:*
 
@@ -21,17 +23,17 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 
 ## Description
 
-**EFEMem DB** is an ultra-light, fast and effective NoSQL database, based on key-value pairs, running enterely on RAM memory.
+**EFEMem DB** is an ultra-light, fast and efficient NoSQL database, based on key-value pairs, running entirely on RAM memory.
 
 With a few and very easy commands, you can take the control of your data.
 
 
 
-`const { efememdb } = require('efememdb');`
+`const { efemem } = require('efememdb');`
 
-`let result = efememdb.set("hello", "world");`
+`let result = efemem.set("hello", "world");`
 
-`result = efememdb.get("hello");`
+`result = efemem.get("hello");`
 
 
 
@@ -51,7 +53,7 @@ These are the main features of **EFEMem DB**:
 - **Persistence.** The data can be saved into disk and restore it when you want.
 - **NoSQL.** You don't need complex relationships between tables, or strict schemas. You use key-value pairs.
 - **Space names.** You can organize your keys using space names. You can use keys with the same name, but unique in different spaces.
-- **Rich data.** You can use diferent types of data:
+- **Rich data.** You can use different types of data:
   - integer numbers
   - float numbers
   - string text
@@ -65,7 +67,7 @@ These are the main features of **EFEMem DB**:
 
 You can use this amazing data base in your NodeJS, as a complementary database for highly and immediate availability of data, such as real-time monitoring, recycled logs, cache, configuration, master data, etc.
 
-You also can use **EFEMem DB** in your web applications, without need to call remote, heavy and slow APIs, storing and retrieving data for local web purposes.
+You also can use **EFEMem DB** in your web applications, without need to call remote, heavy and slow APIs, storing and retrieving data for local web purposes. It's ideally for PWAs.
 
 
 

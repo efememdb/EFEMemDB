@@ -3,7 +3,7 @@
 examples.js
 
 EFEMem NoSQL DataBase examples
-Version 1.0.0
+Version 1.0.4
 
 Created by Rafael Hernamperez and released under the terms of the ISC License:
 https://opensource.org/licenses/ISC
@@ -14,6 +14,13 @@ Copyright 2020 Rafael Hernamperez
 \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 */
 const { efemem } = require("efememdb");
+
+// EFEMem Database version
+console.log(efemem.info());
+
+// Environment
+if (efemem.nodejsEnv) console.log(`EFEMem DB is running on NodeJS`);
+else console.log(`EFEMem DB is running out of NodeJS`);
 
 // Data assignation
 // Integer value
@@ -68,3 +75,5 @@ console.log(`Delete: ${JSON.stringify(result, null, 2)}`);
 // Statistics
 result = efemem.stats();
 console.log(`Statistics: ${JSON.stringify(result, null, 2)}`);
+
+console.log(efemem.info());

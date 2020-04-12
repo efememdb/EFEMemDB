@@ -1,10 +1,25 @@
 # Change log
 
+## 1.0.4 (2020-04-12)
+
+### Features
+
+- EFEMem DB Logo included in documentation
+- Complete code in an unique JS file
+- Execution environment identification through the `nodejsEnv` property (`true` or `false`)
+- Execution time calculated with `Date()` instead of `process.hrtime()`. This method is valid for NodeJS and standard JavaScript
+- Added `info()` command. 
+
+
+
+### Fixes
+
+- Documentation corrections
+- `keysmax` config parameter changed to `maxKeys`
+
 
 
 ## 1.0.3 (2020-04-11)
-
-
 
 ### Fixes
 
@@ -19,21 +34,15 @@ Tunning package.json
 
 
 
-
-
 ## 1.0.1 (2020-04-11)
 
 Tuninng package.json
 
 
 
-
-
 ## 1.0.0 (2020-04-10)
 
 **EFEMem Database first version.**
-
-
 
 ### Features
 
@@ -56,6 +65,6 @@ Tuninng package.json
   - setConfig
 - Configuration params:
   - maxMemory
-  - keysMax
+  - maxKeys
   - reclyclingMode
   - dataPath

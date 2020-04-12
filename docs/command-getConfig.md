@@ -1,18 +1,14 @@
 # getConfig() command
 
-## **Syntax** 
+## **Syntax**
 
 `getConfig(param)`
-
-
 
 ## **Parameters**
 
 | Parameter | Type   | Mandatory | Description          |
 | --------- | ------ | --------- | -------------------- |
 | `param`   | string | Yes       | Config parameter key |
-
-
 
 ## **Description**
 
@@ -30,23 +26,16 @@ The configuration parameters are the following:
 | `recyclingMode` | boolean | If **true**, when number of keys reaches the **keysMax** value, automatically, the first key will be deleted and the next key will be added to the top. If **false**, you the new keys cannot be added. |
 | `dataPath`      | string  | Path directory where the persistence will be stored.         |
 
-
-
 ## **Examples**
 
 `const { efemem } = require('./efememdb.js');`
 
 `let result = efemem.getConfig("keysMax");`
 
-
-
 The result will be the following one:
 
 `result: {`
-  `"ok": true,`
-  `"data": 1000,`
-  `"msg": "EFEMem DB configuration parameter name 'keysMax' found"`
+`"ok": true,`
+`"data": 1000,`
+`"msg": "EFEMem DB configuration parameter name 'keysMax' found"`
 `}`
-
-
-

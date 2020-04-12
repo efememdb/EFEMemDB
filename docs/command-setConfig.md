@@ -1,10 +1,8 @@
 # setConfig() command
 
-## **Syntax** 
+## **Syntax**
 
 `setConfig(param, value)`
-
-
 
 ## **Parameters**
 
@@ -12,8 +10,6 @@
 | --------- | ------ | --------- | ---------------------- |
 | `param`   | string | Yes       | Config parameter key   |
 | `value`   | any    | Yes       | Config parameter value |
-
-
 
 ## **Description**
 
@@ -31,23 +27,18 @@ The configuration parameters are the following:
 | `recyclingMode` | boolean | If **true**, when number of keys reaches the **keysMax** value, automatically, the first key will be deleted and the next key will be added to the top. If **false**, you the new keys cannot be added. |
 | `dataPath`      | string  | Path directory where the persistence will be stored.         |
 
-
-
 ## **Examples**
 
 `const { efemem } = require('./efememdb.js');`
 
 `let result = efemem.setConfig("keysMax", 2000);`
 
-
-
 The result will be the following one:
 
 `result: {`
-  `"ok": true,`
-  `"cmd": "setConfig()",`
-  `"data": 2000,`
-  `"msg": "EFEMem DB configuration parameter 'keysMax' was assigned with value '2000'",`
-  `"affected": 1`
+`"ok": true,`
+`"cmd": "setConfig()",`
+`"data": 2000,`
+`"msg": "EFEMem DB configuration parameter 'keysMax' was assigned with value '2000'",`
+`"affected": 1`
 `}`
-

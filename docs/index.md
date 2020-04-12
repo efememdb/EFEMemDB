@@ -1,8 +1,10 @@
 # EFEMem DB
 
-**Easy, Fast and Effective MEMory NoSQL DataBase**
+**Easy, Fast and Efficient MEMory NoSQL DataBase**
 
-**version 1.0.0**
+**version 1.0.4**
+
+<img src="EFEMemDB-icon.png" alt="./" style="zoom:50%;" />
 
 *Created by Rafael Hernamperez and released under the terms of the ISC License:*
 
@@ -40,6 +42,7 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 - [spaces](command-spaces.md)
 - [keys](command-keys.md)
 - [values](command-values.md)
+- [info](command-info.md)
 - [memory](command-memory.md)
 - [stats](command-stats.md)
 - [getConfig](command-getConfig.md)

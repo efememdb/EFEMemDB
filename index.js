@@ -3,7 +3,7 @@
 index.js
 
 Easy, Fast and Effective MEMory NoSQL DataBase
-Version 1.0.0
+Version 1.0.4
 
 Created by Rafael Hernamperez and released under the terms of the ISC License:
 https://opensource.org/licenses/ISC
@@ -27,7 +27,6 @@ PERFORMANCE OF THIS SOFTWARE.
 \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 */
 const efememconf = require("./efememdb.json");
-const utils = require("./efememutils");
 const path = require("path");
 const fs = require("fs");
 
@@ -38,14 +37,15 @@ class EFEMemDB {
   constructor() {
     this.spkeys = [];
     this.data = [];
+    this.version = `1.0.4`;
     this.config = {
       accessKey: efememconf.hasOwnProperty("accessKey")
         ? efememconf.accessKey
-        : utils.getRandomKey(64),
+        : getRandomKey(64),
       maxMemory: efememconf.hasOwnProperty("maxMemory")
         ? efememconf.maxMemory
         : 1048576,
-      keysMax: efememconf.hasOwnProperty("keysMax") ? efememconf.keysMax : 1000,
+      maxKeys: efememconf.hasOwnProperty("maxKeys") ? efememconf.maxKeys : 1000,
       recyclingMode: efememconf.hasOwnProperty("recyclingMode")
         ? efememconf.recyclingMode
         : false,
@@ -54,7 +54,37 @@ class EFEMemDB {
         : `.${path.sep}`,
     };
 
+    // Execution in NodeJS?
+    try {
+      process.version;
+      this.nodejsEnv = true;
+    } catch (err) {
+      this.nodejsEnv = false;
+    }
+
     this.restore();
+  }
+
+  /**
+   * Returns the complete status info of EFEMem Database
+   */
+  info() {
+    const spaces = this.spaces();
+    let info = `EFEMem NoSQL DataBase version ${this.version}\n\n`;
+    info += `Running on NodeJS: ${this.nodejsEnv}\n`;
+    info += `Configuration: ${JSON.stringify(this.config, null, 2)}\n`;
+    info += `Memory usage: ${JSON.stringify(this.memory(), null, 2)}\n`;
+
+    if (Object.prototype.toString.call(spaces.data) != "[object Array]")
+      info += `Total spaces: 0\n`;
+    else {
+      info += `Total spaces: ${spaces.data.length}\n`;
+      info += `   ${JSON.stringify(spaces.data)}\n`;
+    }
+
+    info += `Total keys: ${this.spkeys.length} of ${this.config.maxKeys}\n`;
+
+    return info;
   }
 
   /**
@@ -66,7 +96,7 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
   set(key, value, space, due) {
-    const start = process.hrtime();
+    const start = new Date();
 
     // Validations
     if (key == undefined || key == null)
@@ -101,7 +131,7 @@ class EFEMemDB {
     // Validate space name
     if (space == undefined || space == null || space == "") space = "public";
 
-    let validation = utils.validateEntity(
+    let validation = validateEntity(
       space,
       SPACE_MAX_LENGTH,
       new RegExp(/[^0-9a-zA-Z]+/g)
@@ -117,7 +147,7 @@ class EFEMemDB {
       };
 
     // Validate key name
-    validation = utils.validateEntity(
+    validation = validateEntity(
       key,
       KEY_MAX_LENGTH,
       new RegExp(/[^0-9a-zA-Z|#:_.]+/g)
@@ -136,12 +166,10 @@ class EFEMemDB {
     const realKey = `${space}@${key}`;
 
     //const now = new Date().toISOString();
-    const now = utils.getLocalNow();
-    const dueTime = utils.getDueTime(due);
+    const now = getLocalNow();
+    const dueTime = getDueTime(due);
 
     const data = {
-      //key: key,
-      //space: space,
       value: value,
       due: dueTime,
       updated: now,
@@ -164,14 +192,14 @@ class EFEMemDB {
         };
 
       // If maximum number of keys has been reached
-      if (this.spkeys.length >= this.config.keysMax)
+      if (this.spkeys.length >= this.config.maxKeys)
         if (!this.config.recyclingMode)
           // if not recycling mode dont's save ky
           return {
             ok: false,
             cmd: "set()",
             data: value,
-            msg: `Key '${key}' cannot be saved. Maximum number of keys (${this.config.keysMax}) has been reached`,
+            msg: `Key '${key}' cannot be saved. Maximum number of keys (${this.config.maxKeys}) has been reached`,
             affected: 0,
           };
         // else recycling mode, deletes the first key
@@ -195,7 +223,7 @@ class EFEMemDB {
       data: data,
       msg: `Key '${key}' saved successfully in space '${space}'`,
       affected: 1,
-      time: utils.finishTime(start),
+      time: finishTime(start),
     };
   } // function set()
 
@@ -206,7 +234,7 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: [key_names], msg: 'message', affected: number, time: 'execution_time' }
    */
   keys(key, space) {
-    const start = process.hrtime();
+    const start = new Date();
 
     if (key === undefined || key === null || key === "*") key = "";
 
@@ -252,7 +280,7 @@ class EFEMemDB {
       data: result,
       msg: `Keys for '${key}' and space '${space}' patterns retrieved successfully`,
       affected: result.length,
-      time: utils.finishTime(start),
+      time: finishTime(start),
     };
   } // function keys()
 
@@ -261,7 +289,7 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: [space_names]], msg: 'message', affected: number, time: 'execution_time' }
    */
   spaces() {
-    const start = process.hrtime();
+    const start = new Date();
 
     let spaces = [];
 
@@ -278,7 +306,7 @@ class EFEMemDB {
         data: spaces.sort(),
         msg: `${spaces.length} spaces used`,
         affected: spaces.length,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
     else
       return {
@@ -287,7 +315,7 @@ class EFEMemDB {
         data: {},
         msg: `No space used`,
         affected: 0,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
   } // function spaces()
 
@@ -305,7 +333,7 @@ class EFEMemDB {
         msg: "Error: No key provided",
       };
 
-    let validation = utils.validateEntity(
+    let validation = validateEntity(
       key,
       KEY_MAX_LENGTH,
       new RegExp(/[^0-9a-zA-Z|#:_.]+/g)
@@ -317,7 +345,7 @@ class EFEMemDB {
         msg: `Error on key: ${validation.msg}`,
       };
 
-    validation = utils.validateEntity(
+    validation = validateEntity(
       space,
       SPACE_MAX_LENGTH,
       new RegExp(/[^0-9a-zA-Z]+/g)
@@ -353,7 +381,7 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
   get(key, space = "public") {
-    const start = process.hrtime();
+    const start = new Date();
     const checked = this.check(key, space);
 
     if (!checked.ok)
@@ -365,7 +393,7 @@ class EFEMemDB {
         affected: 0,
       };
 
-    const now = utils.getLocalNow().toISOString();
+    const now = getLocalNow().toISOString();
 
     // If due time is over
     if (this.data[checked.pos].due < now) {
@@ -390,7 +418,7 @@ class EFEMemDB {
         space == undefined || space == null ? "*" : space
       }' found and retrieved successfully`,
       affected: 1,
-      time: utils.finishTime(start),
+      time: finishTime(start),
     };
   } // function get()
 
@@ -401,7 +429,7 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: [{values}], msg: 'message', affected: number, time: 'execution_time' }
    */
   values(key, space) {
-    const start = process.hrtime();
+    const start = new Date();
 
     // Get key name
     const keys = this.keys(key, space).data;
@@ -434,7 +462,7 @@ class EFEMemDB {
           key == undefined || key == null ? "*" : key
         }' in space '${space == undefined || key == null ? "*" : space}'`,
         affected: result.length,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
 
     // No key faound
@@ -446,7 +474,7 @@ class EFEMemDB {
         key == undefined || key == null ? "*" : key
       }' in space '${space == undefined || space == null ? "*" : space}'`,
       affected: 0,
-      time: utils.finishTime(start),
+      time: finishTime(start),
     };
   } // function values()
 
@@ -457,7 +485,7 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {deleted_value}, msg: 'message', affected: number, time: 'execution_time' }
    */
   delete(key, space = "public") {
-    const start = process.hrtime();
+    const start = new Date();
     const checked = this.check(key, space);
 
     if (!checked.ok)
@@ -467,7 +495,7 @@ class EFEMemDB {
         data: {},
         msg: checked.msg,
         affected: 0,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
 
     const data = this.getKeyDetail(checked.pos);
@@ -480,7 +508,7 @@ class EFEMemDB {
       ...data,
       msg: `Key '${key}' in space '${space}' deleted successfully`,
       affected: 1,
-      time: utils.finishTime(start),
+      time: finishTime(start),
     };
   } // function delete()
 
@@ -510,7 +538,7 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
   rename(key, newKey, space = "public") {
-    const start = process.hrtime();
+    const start = new Date();
     const checked = this.check(key, space);
 
     if (!checked.ok)
@@ -520,7 +548,7 @@ class EFEMemDB {
         data: {},
         msg: checked.msg,
         affected: 0,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
 
     if (newKey == undefined || newKey == null || newKey == "")
@@ -530,10 +558,10 @@ class EFEMemDB {
         data: {},
         msg: "Error: No new key provided",
         affected: 0,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
 
-    let validation = utils.validateEntity(
+    let validation = validateEntity(
       newKey,
       KEY_MAX_LENGTH,
       new RegExp(/[^0-9a-zA-Z|#:_.]+/g)
@@ -546,7 +574,7 @@ class EFEMemDB {
         data: {},
         msg: `Error on new key: ${validation.msg}`,
         affected: 0,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
 
     // Change key name
@@ -558,7 +586,7 @@ class EFEMemDB {
       data: this.data[checked.pos].value,
       msg: `Key '${key}' at space '${space}' was renamed as '${newKey}'`,
       affected: 1,
-      time: utils.finishTime(start),
+      time: finishTime(start),
     };
   } // function rename()
 
@@ -570,7 +598,7 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
   move(key, space, newSpace = "public") {
-    const start = process.hrtime();
+    const start = new Date();
 
     if (space == undefined || space == null || space == "") space = "public";
 
@@ -583,10 +611,10 @@ class EFEMemDB {
         data: {},
         msg: checked.msg,
         affected: 0,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
 
-    let validation = utils.validateEntity(
+    let validation = validateEntity(
       newSpace,
       SPACE_MAX_LENGTH,
       new RegExp(/[^0-9a-zA-Z]+/g)
@@ -599,7 +627,7 @@ class EFEMemDB {
         data: {},
         msg: `Error on new space: ${validation.msg}`,
         affected: 0,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
 
     // Change key name
@@ -611,7 +639,7 @@ class EFEMemDB {
       data: this.data[checked.pos].value,
       msg: `Key '${key}' at space '${space}' was moved to space '${newSpace}'`,
       affected: 1,
-      time: utils.finishTime(start),
+      time: finishTime(start),
     };
   } // function move()
 
@@ -619,7 +647,7 @@ class EFEMemDB {
    * Get statistics about the use of EFEMem DB
    */
   stats() {
-    const start = process.hrtime();
+    const start = new Date();
 
     // Get spaces
     const spaces = this.spaces();
@@ -656,9 +684,9 @@ class EFEMemDB {
         const value = this.get(key.key, space);
 
         // update the size on counters
-        ksize += utils.getValueSize(key);
-        vsize += utils.getValueSize(value.data.value);
-        dsize += utils.getValueSize(value.data);
+        ksize += getValueSize(key);
+        vsize += getValueSize(value.data.value);
+        dsize += getValueSize(value.data);
       }
 
       keySize += ksize;
@@ -681,7 +709,7 @@ class EFEMemDB {
     result.dataSize = dataSize;
     result.dbSize = dbSize - dataSize;
     result.totalSize = result.keySize + result.dataSize + result.dbSize;
-    result.time = utils.finishTime(start);
+    result.time = finishTime(start);
 
     return result;
   } // function stats()
@@ -720,9 +748,9 @@ class EFEMemDB {
   memory() {
     let size = 0;
 
-    for (const item of this.spkeys) size += utils.getValueSize(item);
+    for (const item of this.spkeys) size += getValueSize(item);
 
-    for (const item of this.data) size += utils.getValueSize(item);
+    for (const item of this.data) size += getValueSize(item);
 
     return {
       maxMemory: this.config.maxMemory,
@@ -780,7 +808,7 @@ class EFEMemDB {
         affected: 0,
       };
 
-    let validation = utils.validateEntity(
+    let validation = validateEntity(
       param,
       SPACE_MAX_LENGTH,
       new RegExp(/[^0-9a-zA-Z]+/g)
@@ -830,7 +858,7 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
   persist() {
-    const start = process.hrtime();
+    const start = new Date();
     let numSpaces = 0;
     let numKeys = 0;
 
@@ -856,7 +884,7 @@ class EFEMemDB {
 
     // Loop each key
     for (let i = 0; i < max; i++) {
-      const now = utils.getLocalNow().toISOString();
+      const now = getLocalNow().toISOString();
 
       // If key time is not due
       if (this.data[i].due > now) {
@@ -885,7 +913,7 @@ class EFEMemDB {
       data: {},
       msg: `EFEMem DB has persisted the data. Total spaces: ${numSpaces}. Total keys: ${numKeys}`,
       affected: numKeys,
-      time: utils.finishTime(start),
+      time: finishTime(start),
     };
   } // function persist()
 
@@ -894,16 +922,15 @@ class EFEMemDB {
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
   restore() {
-    const start = process.hrtime();
+    const start = new Date();
     let numSpaces = 0;
     let numKeys = 0;
 
     // Reads the index master file
     let filename = `${this.config.dataPath}${path.sep}efememdb.idb`;
 
+    // if index data exists
     if (fs.existsSync(filename)) {
-      // if index data exists
-
       const idxSpaces = fs.readFileSync(filename, "utf8").split("\n");
       console.log(idxSpaces[0]);
 
@@ -934,7 +961,7 @@ class EFEMemDB {
         data: {},
         msg: `EFEMem DB has restored the data. Total spaces: ${numSpaces}. Total keys: ${numKeys}`,
         affected: numKeys,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
     } // if index file data exists
     else
@@ -944,10 +971,190 @@ class EFEMemDB {
         data: {},
         msg: `EFEMem DB cannot restore data. No persisted data found`,
         affected: 0,
-        time: utils.finishTime(start),
+        time: finishTime(start),
       };
   } // function restore()
 } // Efemem DB Class
+
+/* Returns the approximate memory usage, in bytes, of the specified object. The
+ * parameter is:
+ *
+ * object - the object whose size should be determined
+ */
+
+/**
+ * Validates the name of an entity (space, key, etc.)
+ * @param {string} entity => Entity name to validate
+ * @param {int} length => Maximum length
+ * @param {regexp} regexp => Regular expression
+ * @returns {JSON} => {ok: true|false, msg='message'}
+ */
+const validateEntity = (entity, length, regexp) => {
+  // Check if the entity is a string
+  if (typeof entity != "string")
+    return {
+      ok: false,
+      msg: `'${entity}' name must be a string`,
+    };
+
+  // Check if the entity length is correct
+  if (entity.length > length)
+    return {
+      ok: false,
+      msg: `'${entity}' name is longer than ${length} characters`,
+    };
+
+  // Chek if the first character is alphapbetical
+  let regex = new RegExp(/^[a-zA-Z]/);
+
+  if (!regex.test(entity))
+    return {
+      ok: false,
+      msg: `'${entity}' name is incorrect. First character must be alphabetical`,
+    };
+
+  // Check regular expression validation
+  if (regexp.test(entity))
+    return {
+      ok: false,
+      msg: `'${entity}' name is incorrect. Please check the use of possible ilegal special characters`,
+    };
+
+  // Validation is ok
+  return {
+    ok: true,
+    msg: `'${entity}' name is correct`,
+  };
+}; // validateEntity() function
+
+/**
+ * Converts an UTC Date to Local Timezone Date
+ * @param {date} UTCDate => Date
+ * @returns {Date} => Date passed as parameter converted to UTC local time
+ */
+function UTCToLocalDate(UTCDate) {
+  var newDate = new Date(
+    UTCDate.getTime() + UTCDate.getTimezoneOffset() * 60 * 1000
+  );
+
+  var offset = UTCDate.getTimezoneOffset() / 60;
+  var hours = UTCDate.getHours();
+
+  newDate.setHours(hours - offset);
+
+  return newDate;
+} // UTCToLocalDate() function
+
+/**
+ * Gets the current time in local time zone
+ * @returns {Date} => Current local time
+ */
+const getLocalNow = () => {
+  return UTCToLocalDate(new Date());
+};
+
+/**
+ * Gets the current time plus a given seconds
+ * @param {int} seconds => Number of seconds to add to current time
+ * @returns {Date} => Current time increased by seconds parameter
+ */
+const getDueTime = (seconds) => {
+  if (seconds > 0)
+    //return new Date(new Date().getTime() + (seconds * 1000)).toISOString();
+    return new Date(getLocalNow().getTime() + seconds * 1000).toISOString();
+  else return new Date("9999-12-31T23:59:59").toISOString();
+}; // getDue() function
+
+/**
+ * Gets the difference between the moment passed as argument and current moment
+ * @param {hrtime} startTime => Previous moment using process.hrtime
+ * @returns {string} => Difference between startTime and current time (9s 9.999ms 9 nanosecons)
+ */
+const finishTime = (startTime) => {
+  let diff = new Date() - startTime; // Difference in milliseconds
+
+  if (diff < 1) return `< 1 ms`;
+  else return `${diff} ms`;
+}; // finishTime() function
+
+/**
+ * Gets the size of a value as native type (string, number or boolean)
+ * @param {any} value => Value to be calculated
+ * @returns {number} => Size of value. -1 if its type is not native
+ */
+const getNativeSize = (value) => {
+  const valueType = typeof value;
+
+  if (valueType == "string") return value.length * 2;
+
+  if (valueType == "number") return 8;
+
+  if (valueType == "boolean") return 4;
+
+  return -1; // No native type
+}; // getNativeSize() function
+
+/**
+ * Gets the size of any value
+ * @param {any} value => Value to be measured
+ * @returns {number} => Size of value in bytes
+ */
+const getValueSize = (value) => {
+  let items = [value]; // decomponse the value
+  let size = 0;
+
+  // Iterate over the items of the value
+  for (item of items) {
+    // if item is string, number or boolean
+    if (typeof item != "object") size += getNativeSize(item);
+    else {
+      // if item is an array or object
+
+      // If item is an array, sums the length of the name of each one
+      if (Object.prototype.toString.call(item) != "[object Array]")
+        for (const key in item) size += key.length * 2;
+
+      // process each item of the array or object
+      for (const key in item) {
+        let found = false;
+
+        // Look for previous processed key
+        for (element of items) {
+          if (element === item[key]) {
+            found = true;
+            break;
+          }
+        } // element loop
+
+        if (!found) items.push(item[key]);
+      } // key loop
+    } // else type object
+  } // item loop
+
+  return size;
+}; // getValueSize() function
+
+/**
+ * Gets a random Key with a give size
+ * @param {int} size => Size between 16 and 1000 characters
+ * @returns {string} => Random key
+ */
+const getRandomKey = (size = 16) => {
+  let result = "";
+
+  if (size < 1 || size > 1000) size = 16; // minimum size
+
+  for (let i = 0; i < size; i++) {
+    let ascii = 31 + Math.floor(1 + Math.random() * 95);
+
+    if (ascii == 34 || ascii == 92) ascii = 45;
+
+    result += String.fromCharCode(ascii);
+  }
+
+  console.log(result);
+  return result;
+}; // getRandomKey() function
 
 const efemem = new EFEMemDB();
 
