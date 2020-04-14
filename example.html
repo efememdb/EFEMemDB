@@ -1,0 +1,167 @@
+<html>
+  <head>
+    <title>WEB example using EFEMem NoSQL DataBase</title>
+  </head>
+
+  <body>
+    <script src="./efememweb.js"></script>
+
+    <script>
+      function demo() {
+        var content = "<h2>EFEMem Database Info</h2>";
+
+        if (efemem.webEnv) content += "<p>Web environment</p>";
+        else content += "<p>NodeJS environment</p>";
+
+        content += "<p><code>" + efemem.info() + "</code></p>";
+
+        document.getElementById("info").innerHTML = content;
+
+        // Data assignation
+        // Integer value
+        var result = efemem.set("maxValue", 100, "config");
+        // Float value
+        result = efemem.set("salary", "1234.56", "employees");
+        // Text value
+        result = efemem.set("job", "IT Developer", "employees");
+        // Boolean value
+        result = efemem.set("cacheUsage", false, "config");
+        // Array value
+        result = efemem.set(
+          "languages",
+          ["NodeJS", "JavaScript", "Go", "Python", "C++"],
+          "employees"
+        );
+        // JSON object value
+        result = efemem.set(
+          "employee:001",
+          { name: "Rafael", surname: "Hernamperez", position: "CTO" },
+          "employees"
+        );
+
+        // Get data
+        result = efemem.get("employee:001", "employees");
+        console.log(`Employee: ${JSON.stringify(result, null, 2)}`);
+
+        document.getElementById("get").innerHTML =
+          "<h2>get()</h2><p><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code><p>";
+
+        // Spaces list
+        result = efemem.spaces();
+        console.log(`Spaces: ${JSON.stringify(result, null, 2)}`);
+
+        document.getElementById("spaces").innerHTML =
+          "<h2>spaces()</h2><p><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code><p>";
+
+        // Keys list
+        result = efemem.keys(); // All the keys
+        console.log(`Keys: ${JSON.stringify(result, null, 2)}`);
+        content =
+          "<h2>keys()</h2><p><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code></p>";
+
+        result = efemem.keys("", "config"); // All the keys from 'config' space
+        console.log(`'config' keys: ${JSON.stringify(result, null, 2)}`);
+        content +=
+          "<p><code>" + JSON.stringify(result, null, 2) + "</code></p>";
+
+        document.getElementById("keys").innerHTML = content;
+
+        // Get values of the keys from '*emp*' space (employees)
+        result = efemem.values("", "emp");
+        console.log(`'*emp*' values: ${JSON.stringify(result, null, 2)}`);
+
+        document.getElementById("values").innerHTML =
+          "<h2>values()</h2><p><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code><p>";
+
+        // rename 'employee:001' to 'employee:007'
+        result = efemem.rename("employee:001", "employee:007", "employees");
+        console.log(`'Rename:' values: ${JSON.stringify(result, null, 2)}`);
+
+        document.getElementById("rename").innerHTML =
+          "<h2>rename()</h2><p><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code><p>";
+
+        // Move key 'salary' to 'public' space
+        content = "<h2>move()</h2>";
+        result = efemem.move("salary", "employees");
+        console.log(`Move: ${JSON.stringify(result, null, 2)}`);
+        content +=
+          "<p><code>" + JSON.stringify(result, null, 2) + "</code></p>";
+
+        result = efemem.values("", "public");
+        console.log(`'public' values: ${JSON.stringify(result, null, 2)}`);
+        content +=
+          "<p><code>" + JSON.stringify(result, null, 2) + "</code></p>";
+
+        document.getElementById("move").innerHTML = content;
+
+        // Delete key 'job' from 'employees' space
+        result = efemem.delete("job", "employees");
+        console.log(`Delete: ${JSON.stringify(result, null, 2)}`);
+
+        document.getElementById("delete").innerHTML =
+          "<h2>delete()</h2><p><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code><p>";
+
+        // Final data
+        content = "<h2>Final data</h2>";
+        console.log(`----------\n`);
+        console.log(`FINAL DATA\n`);
+        console.log(`----------\n`);
+
+        result = efemem.spaces();
+        console.log(`Spaces: ${JSON.stringify(result, null, 2)}`);
+        content +=
+          "<h3>spaces</h3><code>" + JSON.stringify(result, null, 2) + "</code>";
+
+        result = efemem.keys();
+        console.log(`keys: ${JSON.stringify(result, null, 2)}`);
+        content +=
+          "<h3>keys</h3><code>" + JSON.stringify(result, null, 2) + "</code>";
+
+        result = efemem.values();
+        console.log(`values: ${JSON.stringify(result, null, 2)}`);
+        content +=
+          "<h3>values</h3><code>" + JSON.stringify(result, null, 2) + "</code>";
+
+        console.log(`info: ${JSON.stringify(efemem.info(), null, 2)}`);
+        content += "<h3>info</h3><code>" + efemem.info() + "</code>";
+
+        document.getElementById("final").innerHTML = content;
+
+        // Statistics
+        result = efemem.stats();
+        console.log(`Statistics: ${JSON.stringify(result, null, 2)}`);
+        document.getElementById("stats").innerHTML =
+          "<h2>stats()</h2><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code>";
+      }
+    </script>
+
+    <button onclick="demo()">
+      Click me!
+    </button>
+
+    <div id="info"></div>
+    <div id="get"></div>
+    <div id="spaces"></div>
+    <div id="keys"></div>
+    <div id="values"></div>
+    <div id="rename"></div>
+    <div id="move"></div>
+    <div id="delete"></div>
+    <div id="final"></div>
+    <div id="stats"></div>
+  </body>
+</html>

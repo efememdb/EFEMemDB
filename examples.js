@@ -19,7 +19,7 @@ const { efemem } = require("efememdb");
 console.log(efemem.info());
 
 // Environment
-if (efemem.nodejsEnv) console.log(`EFEMem DB is running on NodeJS`);
+if (!efemem.webEnv) console.log(`EFEMem DB is running on NodeJS`);
 else console.log(`EFEMem DB is running out of NodeJS`);
 
 // Data assignation
@@ -62,6 +62,10 @@ console.log(`'config' keys: ${JSON.stringify(result, null, 2)}`);
 result = efemem.values("", "emp");
 console.log(`'*emp*' values: ${JSON.stringify(result, null, 2)}`);
 
+// rename 'employee:001' to 'employee:007'
+result = efemem.rename("employee:001", "employee:007", "employees");
+console.log(`'Rename:' values: ${JSON.stringify(result, null, 2)}`);
+
 // Move key 'salary' to 'public' space
 result = efemem.move("salary", "employees");
 console.log(`Move: ${JSON.stringify(result, null, 2)}`);
@@ -72,8 +76,18 @@ console.log(`'public' values: ${JSON.stringify(result, null, 2)}`);
 result = efemem.delete("job", "employees");
 console.log(`Delete: ${JSON.stringify(result, null, 2)}`);
 
+// Final Data
+console.log("----------");
+console.log("FINAL DATA");
+console.log("----------");
+result = efemem.spaces();
+console.log(`Spaces: ${JSON.stringify(result, null, 2)}`);
+result = efemem.keys(); // All the keys
+console.log(`Keys: ${JSON.stringify(result, null, 2)}`);
+result = efemem.values();
+console.log(`values: ${JSON.stringify(result, null, 2)}`);
+console.log(`info: ${JSON.stringify(efemem.info(), null, 2)}`);
+
 // Statistics
 result = efemem.stats();
 console.log(`Statistics: ${JSON.stringify(result, null, 2)}`);
-
-console.log(efemem.info());
