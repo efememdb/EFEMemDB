@@ -140,6 +140,14 @@
         document.getElementById("final").innerHTML = content;
 
         // Statistics
+        result = efemem.memory();
+        console.log(`Memory: ${JSON.stringify(result, null, 2)}`);
+        document.getElementById("memory").innerHTML =
+          "<h2>memory()</h2><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code>";
+
+        // Statistics
         result = efemem.stats();
         console.log(`Statistics: ${JSON.stringify(result, null, 2)}`);
         document.getElementById("stats").innerHTML =
@@ -162,6 +170,7 @@
     <div id="move"></div>
     <div id="delete"></div>
     <div id="final"></div>
+    <div id="memory"></div>
     <div id="stats"></div>
   </body>
 </html>

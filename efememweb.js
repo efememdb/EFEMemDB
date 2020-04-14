@@ -74,6 +74,14 @@ const SPACE_MAX_LENGTH = 24;
 //   - delete()
 //   - deleteIndex() => Internal usage
 //   - rename()
+//   - move()
+//   - stats()
+//   - getKeyDetail() => Internal usage
+//   - memory()
+//   - getConfig()
+//   - setConfig()
+//   - persist()
+//   - restore()
 //
 class EFEMemDB {
   // Constructor

@@ -88,6 +88,10 @@ result = efemem.values();
 console.log(`values: ${JSON.stringify(result, null, 2)}`);
 console.log(`info: ${JSON.stringify(efemem.info(), null, 2)}`);
 
+// Delete key 'job' from 'employees' space
+result = efemem.memory();
+console.log(`Memory: ${JSON.stringify(result, null, 2)}`);
+
 // Statistics
 result = efemem.stats();
 console.log(`Statistics: ${JSON.stringify(result, null, 2)}`);
