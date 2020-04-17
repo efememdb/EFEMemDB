@@ -1,0 +1,15 @@
+require("./test-set");
+require("./test-get");
+require("./test-check");
+require("./test-spaces");
+require("./test-keys");
+require("./test-values");
+require("./test-rename");
+require("./test-move");
+require("./test-delete");
+require("./test-getConfig");
+require("./test-setConfig");
+require("./test-memory");
+require("./test-info");
+require("./test-persist");
+require("./test-restore");

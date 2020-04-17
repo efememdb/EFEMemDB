@@ -20,7 +20,7 @@ This command is used automatically by **EFEMem DB** when starts, but you can use
 
 You can persist the current data, using the command `persist()`.
 
-**Important note:** *This command only can be used on NodeJS.*
+
 
 
 
@@ -32,7 +32,7 @@ The following command restores the last persisted data:
 
 
 
-The result will be following one:
+The result will be the following one:
 
 `result: {`
   `"ok": true,`

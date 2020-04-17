@@ -4,7 +4,7 @@
   </head>
 
   <body>
-    <script src="./efememweb.js"></script>
+    <script src="../efememdb.js"></script>
 
     <script>
       function demo() {
@@ -21,7 +21,7 @@
         // Integer value
         var result = efemem.set("maxValue", 100, "config");
         // Float value
-        result = efemem.set("salary", "1234.56", "employees");
+        result = efemem.set("salary", 1234.56, "employees");
         // Text value
         result = efemem.set("job", "IT Developer", "employees");
         // Boolean value
@@ -154,6 +154,28 @@
           "<h2>stats()</h2><code>" +
           JSON.stringify(result, null, 2) +
           "</code>";
+
+        // persist
+        result = efemem.persist();
+        console.log(`persist: ${JSON.stringify(result, null, 2)}`);
+        document.getElementById("persist").innerHTML =
+          "<h2>persist()</h2><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code>";
+
+        result = efemem.restore();
+        console.log(`restore: ${JSON.stringify(result, null, 2)}`);
+        document.getElementById("restore").innerHTML =
+          "<h2>restore()</h2><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code>";
+
+        result = efemem.values();
+        console.log(`values: ${JSON.stringify(result, null, 2)}`);
+        document.getElementById("values2").innerHTML =
+          "<h2>values()</h2><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code>";
       }
     </script>
 
@@ -172,5 +194,8 @@
     <div id="final"></div>
     <div id="memory"></div>
     <div id="stats"></div>
+    <div id="persist"></div>
+    <div id="restore"></div>
+    <div id="values2"></div>
   </body>
 </html>

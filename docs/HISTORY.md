@@ -1,5 +1,26 @@
 # Change log
 
+## 1.0.5 (2020-04-19)
+
+### Features
+
+- Added automated testing (`testing` folder)
+- Main and unique file: `efememdb.js`
+- Code adapted for Web applications
+- `example.html` demo
+
+
+
+### Fixes
+
+- Added `created`, `updated` and `due` dates to the result of `values()` command
+-  `persist()` command refactorized and optimized
+- Extension for index file (persistence): `efememdb.efs` (EFemem Spaces)
+- Extension for data files (persistence): `<space_name>.efd` (EFemem Data)
+- `restore()` command refactorized and optimized
+
+
+
 ## 1.0.4 (2020-04-12)
 
 ### Features

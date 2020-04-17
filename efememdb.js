@@ -1,11 +1,9 @@
 /*
 /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-efememweb.js
+efememdb.js
 
-Easy, Fast and Effective MEMory NoSQL DataBase
+Easy, Fast and Efficient MEMory NoSQL DataBase
 Version 1.0.5
-
-EFEMem DB for web applications
 
 Created by Rafael Hernamperez and released under the terms of the ISC License:
 https://opensource.org/licenses/ISC
@@ -31,15 +29,17 @@ PERFORMANCE OF THIS SOFTWARE.
 
 let webEnv = false;
 let efememconf = {};
+let path;
+let fs;
 
-// Determine the environment
+// Determine the current environment
 try {
   // NodeJS Environment
   process.version; // If not NodeJS this will cause an exception (Web)
   webEnv = false;
   efememconf = require("./efememdb.json");
-  const path = require("path");
-  const fs = require("fs");
+  path = require("path");
+  fs = require("fs");
 } catch (err) {
   // Web Environment
   webEnv = true;
@@ -48,7 +48,7 @@ try {
   efememconf.maxMemory = 1048576;
   efememconf.maxKeys = 1000;
   efememconf.recyclingMode = false;
-  efememconf.dataPath = "./";
+  efememconf.dataPath = "";
 }
 
 // Main constants
@@ -102,12 +102,12 @@ class EFEMemDB {
         : false,
       dataPath: efememconf.hasOwnProperty("dataPath")
         ? efememconf.dataPath
-        : `.${path.sep}`,
+        : "",
     };
 
     this.webEnv = webEnv;
 
-    if (!webEnv) this.restore();
+    this.restore();
   }
 
   /**
@@ -495,6 +495,15 @@ class EFEMemDB {
             key: item.key,
             space: item.space,
             value: value.data.value,
+            created:
+              typeof value.data.created != "string"
+                ? value.data.created.toISOString()
+                : value.data.created,
+            updated:
+              typeof value.data.updated != "string"
+                ? value.data.updated.toISOString()
+                : value.data.updated,
+            due: value.data.due,
           });
         }
       } // valid item
@@ -902,7 +911,7 @@ class EFEMemDB {
   } // function setConfig()
 
   /**
-   * Save all data to files, into the path defined on 'dataPath' configuration parameter
+   * Save physically all data into files (nodeJS environment) or into localStorage (web environment)
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
   persist() {
@@ -910,59 +919,98 @@ class EFEMemDB {
     let numSpaces = 0;
     let numKeys = 0;
 
-    // Generate the file master, which contains all the spaces. Each space is a database file
-    const spaces = this.spaces();
-    let filename = `${this.config.dataPath}${path.sep}efememdb.idb`;
+    try {
+      const spaces = this.spaces();
 
-    if (fs.existsSync(filename)) fs.unlinkSync(filename);
+      // Create index (list of spaces)
+      if (this.webEnv)
+        localStorage.setItem("efememdb-efs", spaces.data.toString());
+      else {
+        // NodeJS environment. Creates the index file (efememdb.efs (EFemem Spaces))
+        let filename =
+          this.config.dataPath != ""
+            ? `${this.config.dataPath}${path.sep}efememdb.efs`
+            : "efememdb.efs";
 
-    for (const space of spaces.data) {
-      try {
-        const rdbFile = `${this.config.dataPath}${path.sep}${space}.data`;
-        if (fs.existsSync(rdbFile)) fs.unlinkSync(rdbFile);
-
-        fs.appendFileSync(filename, `${space}\n`, "utf8");
-        numSpaces++;
-      } catch (error) {
-        console.log(error);
+        // Delete existing index file
+        if (fs.existsSync(filename)) fs.unlinkSync(filename);
+        fs.appendFileSync(filename, `${spaces.data.toString()}`, "utf8");
       }
-    }
 
-    const max = this.spkeys.length;
+      // For each space
+      for (const space of spaces.data) {
+        numSpaces++;
 
-    // Loop each key
-    for (let i = 0; i < max; i++) {
-      const now = getLocalNow().toISOString();
+        // Get the values of all the keys from the current space
+        const values = this.values("", space);
 
-      // If key time is not due
-      if (this.data[i].due > now) {
-        const sk = this.spkeys[i].split("@");
-        filename = `${this.config.dataPath}${path.sep}${sk[0]}.data`;
-        const data = {
-          key: sk[1],
-          space: sk[0],
-          data: this.data[i],
-        };
+        // Values for web environment
+        let lines = [];
 
-        const line = JSON.stringify(data) + "\n";
+        // Filename for NodeJs environment: <space_name>.efd (EFememdb Data)
+        let filename = "";
 
-        try {
-          fs.appendFileSync(filename, line, "utf8");
-          numKeys++;
-        } catch (error) {
-          console.log(error);
+        // If NodeJS environment, delete previous data file
+        if (!this.webEnv) {
+          filename =
+            this.config.dataPath != ""
+              ? `${this.config.dataPath}${path.sep}${space}.efd`
+              : `${space}.efd`;
+
+          if (fs.existsSync(filename)) fs.unlinkSync(filename);
         }
-      } // else valid key
-    } // for
 
-    return {
-      ok: true,
-      cmd: "persist()",
-      data: {},
-      msg: `EFEMem DB has persisted the data. Total spaces: ${numSpaces}. Total keys: ${numKeys}`,
-      affected: numKeys,
-      time: finishTime(start),
-    };
+        // For each key/value
+        for (const value of values.data) {
+          const now = getLocalNow().toISOString();
+
+          // if due datetime is valid
+          if (now < value.due) {
+            numKeys++;
+
+            // Compose data to persist
+            const data = {
+              key: value.key,
+              space: value.space,
+              data: {
+                value: value.value,
+                created: value.created,
+                updated: value.updated,
+                key: value.due,
+              },
+            };
+
+            // If web environment, adds data to lines array
+            if (this.webEnv) lines.push(data);
+            // NodeJS environment. File space
+            else
+              fs.appendFileSync(filename, `${JSON.stringify(data)}\n`, "utf8");
+          } // if due valid datetime
+        } // for values
+
+        // If web environment, saves space and its keys/values into localstorage
+        if (webEnv)
+          localStorage.setItem(`efememdb_${space}`, JSON.stringify(lines));
+      } // for spaces
+
+      return {
+        ok: true,
+        cmd: "persist()",
+        data: {},
+        msg: `EFEMem DB has persisted the data. Total spaces: ${numSpaces}. Total keys: ${numKeys}`,
+        affected: numKeys,
+        time: finishTime(start),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        cmd: "persist()",
+        data: {},
+        msg: `EFEMem DB cannot persist the data. Error: ${error}`,
+        affected: 0,
+        time: finishTime(start),
+      };
+    }
   } // function persist()
 
   /**
@@ -973,56 +1021,83 @@ class EFEMemDB {
     const start = new Date();
     let numSpaces = 0;
     let numKeys = 0;
+    let spaces = [];
+    let filename = "";
 
-    if (!webEnv) {
-      // Reads the index master file
-      let filename = `${this.config.dataPath}${path.sep}efememdb.idb`;
+    try {
+      // If NodeJS environment, get spaces from index file
+      if (!this.webEnv) {
+        // Reads the index master file
+        filename =
+          this.config.dataPath != ""
+            ? `${this.config.dataPath}${path.sep}efememdb.efs`
+            : "efememdb.efs";
 
-      // if index data exists
-      if (fs.existsSync(filename)) {
-        const idxSpaces = fs.readFileSync(filename, "utf8").split("\n");
-        console.log(idxSpaces[0]);
+        // if index data exists
+        if (fs.existsSync(filename)) {
+          spaces = fs.readFileSync(filename, "utf8").split(",");
+        }
+      }
+      // If Web environment, get spaces from localstorage index key
+      else spaces = localStorage.getItem("efememdb-efs").split(",");
 
-        // Reads each space database
-        for (const space of idxSpaces) {
-          // valid space (not empty)
-          if (space != null && space != "") {
-            numSpaces++;
+      // Reads each space data file
+      for (const space of spaces) {
+        // valid space (not empty)
+        if (space != null && space != "") {
+          numSpaces++;
 
-            filename = `${this.config.dataPath}${path.sep}${space}.data`;
+          let keys = [];
 
-            const keys = fs.readFileSync(filename, "utf8").split("\n");
-            // Restore each key of the current space
-            for (const key of keys) {
-              // valid key
-              if (key != null && key != "") {
-                numKeys++;
-                const data = JSON.parse(key);
-                this.set(data.key, data.data, data.space);
-              } // valid key
-            } // for key
-          } // if valid space
-        } // for space
+          // If NodeJS environment, retrieve keys from space data file
+          if (!this.webEnv) {
+            filename =
+              this.config.dataPath != ""
+                ? `${this.config.dataPath}${path.sep}${space}.efd`
+                : `${space}.efd`;
 
-        return {
-          ok: true,
-          cmd: "restore()",
-          data: {},
-          msg: `EFEMem DB has restored the data. Total spaces: ${numSpaces}. Total keys: ${numKeys}`,
-          affected: numKeys,
-          time: finishTime(start),
-        };
-      } // if index file data exists
-      else
-        return {
-          ok: true,
-          cmd: "restore()",
-          data: {},
-          msg: `EFEMem DB cannot restore data. No persisted data found`,
-          affected: 0,
-          time: finishTime(start),
-        };
-    } // if NodeJS environment
+            keys = fs.readFileSync(filename, "utf8").split("\n");
+          }
+          // If Web environment, retrieve keys from localstorage space key
+          else keys = JSON.parse(localStorage.getItem(`efememdb_${space}`));
+
+          // Restore each key of the current space
+          for (const key of keys) {
+            // valid key
+            if (key != null && key != "") {
+              numKeys++;
+
+              const data = !this.webEnv ? JSON.parse(key) : key;
+
+              this.set(data.key, data.data.value, data.space);
+
+              // Restore original datatime fields
+              this.data[this.data.length - 1].due = data.data.due;
+              this.data[this.data.length - 1].created = data.data.created;
+              this.data[this.data.length - 1].updated = data.data.updated;
+            } // valid key
+          } // for key
+        } // if valid space
+      } // for space
+
+      return {
+        ok: true,
+        cmd: "restore()",
+        data: {},
+        msg: `EFEMem DB has restored the data. Total spaces: ${numSpaces}. Total keys: ${numKeys}`,
+        affected: numKeys,
+        time: finishTime(start),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        cmd: "restore()",
+        data: {},
+        msg: `EFEMem DB cannot restore data. Error: ${error}`,
+        affected: 0,
+        time: finishTime(start),
+      };
+    }
   } // function restore()
 } // Efemem DB Class
 
@@ -1067,7 +1142,7 @@ const validateEntity = (entity, length, regexp) => {
   if (regexp.test(entity))
     return {
       ok: false,
-      msg: `'${entity}' name is incorrect. Please check the use of possible ilegal special characters`,
+      msg: `'${entity}' name is incorrect. Please check the use of possible illegal special characters`,
     };
 
   // Validation is ok

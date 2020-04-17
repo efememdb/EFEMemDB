@@ -3,5 +3,5 @@
   "maxMemory": 1048576,
   "keysMax": 1000,
   "recyclingMode": false,
-  "dataPath": "./"
+  "dataPath": ""
 }
