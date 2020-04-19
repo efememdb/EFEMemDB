@@ -2,7 +2,7 @@
 
 **Easy, Fast and Efficient MEMory NoSQL DataBase**
 
-**version 1.0.5**
+**version 1.0.7**
 
 <img src="EFEMemDB-icon.png" alt="EFEMem NoSQL Database" style="zoom:50%;" />
 
