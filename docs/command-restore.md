@@ -18,7 +18,9 @@ The `restore()` command retrieves all the last persisted data (made with the com
 
 This command is used automatically by **EFEMem DB** when starts, but you can use it when you consider necessary.
 
-You can persist the current data, using the command `persist()`.
+
+
+**Note:** *You can persist the current data, using the command `persist()`.*
 
 
 
@@ -28,18 +30,31 @@ You can persist the current data, using the command `persist()`.
 
 The following command restores the last persisted data:
 
-`result = efemem.restore();`
+```javascript
+result = efemem.restore();
+```
 
 
 
 The result will be the following one:
 
-`result: {`
-  `"ok": true,`
-  `"cmd": "restore()",`
-  `"data": {},`
-  `"msg": "Efemem DB has restored the data. Total spaces: 3. Total keys: 4",`
-  `"affected": 4,`
-  `"time": "0s 12.355ms (12355200 nanoseconds)"`
-`}`
+```javascript
+result: {
+  "ok": true,
+  "cmd": "restore()",
+  "data": {},
+  "msg": "Efemem DB has restored the data. Total spaces: 3. Total keys: 4",
+  "affected": 4,
+  "time": "0s 12.355ms (12355200 nanoseconds)"
+}
+```
 
+
+
+## See also
+
+- [persist() command](command-persist.md)
+
+
+
+[Go to index](index.md)

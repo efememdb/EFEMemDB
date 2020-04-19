@@ -29,16 +29,32 @@ The configuration parameters are the following:
 
 ## **Examples**
 
-`const { efemem } = require('./efememdb.js');`
+```javascript
+const { efemem } = require('./efememdb.js');
 
-`let result = efemem.setConfig("keysMax", 2000);`
+let result = efemem.setConfig("keysMax", 2000);
+```
+
+
 
 The result will be the following one:
 
-`result: {`
-`"ok": true,`
-`"cmd": "setConfig()",`
-`"data": 2000,`
-`"msg": "EFEMem DB configuration parameter 'keysMax' was assigned with value '2000'",`
-`"affected": 1`
-`}`
+```javascript
+result: {
+    "ok": true,
+    "cmd": "setConfig()",
+    "data": 2000,
+    "msg": "EFEMem DB configuration parameter 'keysMax' was assigned with value '2000'",
+    "affected": 1
+}
+```
+
+
+
+## See also
+
+- [getConfig() command](command-getConfig.md)
+
+
+
+[Go to index](index.md)

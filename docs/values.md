@@ -2,11 +2,11 @@
 
 **EFEMem Database** stores different types of values:
 
-- number
-- text
-- boolean
-- array
-- object (JSON)
+- **`number`**
+- **`text`**
+- **`boolean`**
+- **`array`**
+- **`object (JSON)`**
 
 
 
@@ -23,3 +23,15 @@ Some values examples:
 - `["apple", "orange", "banana", "pear"]`  (array)
 - `{ database:"Efemem", type: "Memory DB" }`  (JSON object)
 
+
+
+## See also
+
+- [Keys](keys.md)
+- [Spaces](spaces.md)
+- [get() command](command-get.md)
+- [values() command](command-values.md)
+
+
+
+[Go to index](index.md)

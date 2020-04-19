@@ -4,10 +4,12 @@
 
 ### Features
 
+- Added `copy()` command
 - Added automated testing (`testing` folder)
 - Main and unique file: `efememdb.js`
 - Code adapted for Web applications
 - `example.html` demo
+- `stats()` command calculates now statistics with numeric values applying **count**, **sum**, **min**(imum), **max**(imum), **avg** (average), **var** (variance) and **std** (standard deviation) operations
 
 
 
@@ -18,6 +20,8 @@
 - Extension for index file (persistence): `efememdb.efs` (EFemem Spaces)
 - Extension for data files (persistence): `<space_name>.efd` (EFemem Data)
 - `restore()` command refactorized and optimized
+- `move()` repeated an existing key (if this key was recovered from persistence when starting)
+- Internal functions `getKeyDetail()` and `deleteIndex()` has been written out of the class, and, henceforth, are not accesible.
 
 
 

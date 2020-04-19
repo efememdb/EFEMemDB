@@ -22,17 +22,26 @@ The rules for the space names are the following:
 
 Correct space names could be the following:
 
-- **config**
-- **course2020**
-- **salesAndRevenue**
+- **`config`**
+- **`course2020`**
+- **`salesAndRevenue`**
 
 
 
 Incorrect space names could be the following:
 
-- **course 2020** (space is not allowed)
-- **2020course** (first character cannot be numeric)
-- **sales&revenue** (ampersand is not allowed)
+- **`course 2020`** (space is not allowed)
+- **`2020course`** (first character cannot be numeric)
+- **`sales&revenue`** (ampersand is not allowed)
 
 
 
+## See also
+
+- [Keys](keys.md)
+- [Values](values.md)
+- [spaces() command](command-spaces.md)
+
+
+
+[Go to index](index.md)

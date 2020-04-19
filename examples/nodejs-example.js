@@ -26,7 +26,7 @@ else console.log(`EFEMem DB is running out of NodeJS`);
 // Integer value
 let result = efemem.set("maxValue", 100, "config");
 // Float value
-result = efemem.set("salary", "1234.56", "employees");
+result = efemem.set("salary", 1234.56, "employees");
 // Text value
 result = efemem.set("job", "IT Developer", "employees");
 // Boolean value
@@ -70,7 +70,13 @@ console.log(`'Rename:' values: ${JSON.stringify(result, null, 2)}`);
 result = efemem.move("salary", "employees");
 console.log(`Move: ${JSON.stringify(result, null, 2)}`);
 result = efemem.values("", "public");
-console.log(`'public' values: ${JSON.stringify(result, null, 2)}`);
+console.log(`values: ${JSON.stringify(result, null, 2)}`);
+
+// Copy key 'salary' from 'public' space to 'employees' space
+result = efemem.copy("salary", "public", "salary", "employees");
+console.log(`copy: ${JSON.stringify(result, null, 2)}`);
+result = efemem.values("salary");
+console.log(`'keys "salary"' values: ${JSON.stringify(result, null, 2)}`);
 
 // Delete key 'job' from 'employees' space
 result = efemem.delete("job", "employees");
@@ -92,10 +98,6 @@ console.log(`info: ${JSON.stringify(efemem.info(), null, 2)}`);
 result = efemem.memory();
 console.log(`Memory: ${JSON.stringify(result, null, 2)}`);
 
-// Statistics
-result = efemem.stats();
-console.log(`Statistics: ${JSON.stringify(result, null, 2)}`);
-
 // Persist data
 result = efemem.persist();
 console.log(`persist: ${JSON.stringify(result, null, 2)}`);
@@ -107,3 +109,35 @@ console.log(`restore: ${JSON.stringify(result, null, 2)}`);
 // Values
 result = efemem.values();
 console.log(`values: ${JSON.stringify(result, null, 2)}`);
+
+// Prepare data for statistics
+efemem.set("student:001|class:Python", 9.7, "qualifications");
+efemem.set("student:002|class:Python", 7.5, "qualifications");
+efemem.set("student:003|class:Python", 6.7, "qualifications");
+efemem.set("student:001|class:JavaScript", 8.7, "qualifications");
+efemem.set("student:002|class:JavaScript", 6.6, "qualifications");
+efemem.set("student:003|class:JavaScript", 8.3, "qualifications");
+efemem.set("student:001|class:Java", "9.2", "qualifications");
+efemem.set("student:002|class:Java", "9.5", "qualifications");
+efemem.set("student:003|class:Java", "8.9", "qualifications");
+efemem.set("student:005|class:Python", 5.8, "qualifications");
+
+// Statistics for Python
+result = efemem.stats("Python");
+console.log(`Python Statistics: ${JSON.stringify(result, null, 2)}`);
+
+// Statistics for class Java and JavaScript
+result = efemem.stats("Java", "qualifications");
+console.log(`Java Statistics: ${JSON.stringify(result, null, 2)}`);
+
+// Statistics for student 001
+result = efemem.stats("student:001", "qualifications");
+console.log(`Student 001 Statistics: ${JSON.stringify(result, null, 2)}`);
+
+// Space information
+result = efemem.spaceInfo("qualifications");
+console.log(`space 'qualifications' info: ${JSON.stringify(result, null, 2)}`);
+
+// Persist data
+result = efemem.persist();
+console.log(`persist: ${JSON.stringify(result, null, 2)}`);

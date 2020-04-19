@@ -45,7 +45,7 @@ If you are executing **EFEMem NoSQL Database** in a Web environment, the `persis
 
 This command will create a **localStorage** key named `efememdb-efs`, which will contain the current list of spaces names.
 
-For each space name, it will create a **localStorage** key name `"efememdb"`, followed by the "_" (underscore) and the name of space, which will contain the data of all keys and values on such space name.
+For each space name, it will create a **localStorage** key named `"efememdb"`, followed by the "_" (underscore) and the name of space, which will contain the data of all keys and values on such space name.
 
 These **localStorage** keys will be used by **EFEMem DB** when starts, in order to load automatically the last data persisted.
 
@@ -55,36 +55,42 @@ These **localStorage** keys will be used by **EFEMem DB** when starts, in order 
 
 The following code will create some keys:
 
-`const { efemem } = require('./efememdb.js');`
+```javascript
+const { efemem } = require('./efememdb.js');
 
 
 
-`let result = efemem.set("maxValue", 100, "config");`
+let result = efemem.set("maxValue", 100, "config");
 
-`result = efemem.set("minValue", 1, "config");`
+result = efemem.set("minValue", 1, "config");
 
-`result = efemem.set("maxValue", 3000, "sales");`
+result = efemem.set("maxValue", 3000, "sales");
 
-`result = efemem.set("student:001", {name: "James", surname: "Gordon", job: "Police inspector"}, "students")`
+result = efemem.set("student:001", {name: "James", surname: "Gordon", job: "Police inspector"}, "students")
+```
 
 
 
 You can save the data with the following command:
 
-`result = efemem.persist();`
+```javascript
+result = efemem.persist();
+```
 
 
 
 The result will be following one:
 
-`result: {`
-  `"ok": true,`
-  `"cmd": "persist()",`
-  `"data": {},`
-  `"msg": "EFEMem DB has persisted the data. Total spaces: 3. Total keys: 4",`
-  `"affected": 4,`
-  `"time": "0s 3.630ms (3629900 nanoseconds)"`
-`}`
+```javascript
+result: {
+  "ok": true,
+  "cmd": "persist()",
+  "data": {},
+  "msg": "EFEMem DB has persisted the data. Total spaces: 3. Total keys: 4",
+  "affected": 4,
+  "time": "0s 3.630ms (3629900 nanoseconds)"
+}
+```
 
 
 
@@ -104,3 +110,12 @@ In a web environment, 4 **localStorage** keys will be created:
 - `efememdb_sales`
 - `efememdb_students`
 
+
+
+## See also
+
+- [restore() command](command-restore.md)
+
+
+
+[Go to index](index.md)

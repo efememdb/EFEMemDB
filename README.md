@@ -2,7 +2,7 @@
 
 **Easy, Fast and Efficient MEMory NoSQL DataBase**
 
-**version 1.0.4**
+**version 1.0.5**
 
 <img src="EFEMemDB-icon.png" alt="EFEMem NoSQL Database" style="zoom:50%;" />
 
@@ -23,17 +23,31 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 
 ## Description
 
-**EFEMem DB** is an ultra-light, fast and efficient NoSQL database, based on key-value pairs, running entirely on RAM memory.
+**EFEMem DB** is an ultra-light, fast, easy and efficient NoSQL database, based on key-value pairs, running entirely on RAM memory. 
+
+**EFEMem DB** is written in **JavaScript**, and you can run it directly on the front size, such us web browsers, through web applications (**web pages**. **PWA** (Progressive Web Applications), hybrid mobile applications (made with **Ionic**, **React Native**, **NativeScript**, **Xamarin**, etc.). You can control ad-hoc data without APIs, speeding up your applications. **EFEMem DB** is an ideal solution for your data when the connection is off, providing you a high availability for your users.
+
+You can also run **EFEMem DB** on server side applications, using technologies based on JavaScript, such us **NodeJS**. You can achieve more performance managing master data, cache data, log or monitoring data, highly queried data... Avoid heavy, slow queries and repeated queries to remote databases, optimizing the time and efficiency of your most used data or managing data in real-time.
 
 With a few and very easy commands, you can take the control of your data.
 
+```javascript
+// Web application example
+const { efemem } = require('path/efememdb.js');
+
+let result = efemem.set("hello", "world");
+result = efemem.get("hello");
+```
 
 
-`const { efemem } = require('efememdb');`
 
-`let result = efemem.set("hello", "world");`
+```javascript
+// NodeJS example
+const { efemem } = require('efememdb');
 
-`result = efemem.get("hello");`
+let result = efemem.set("hello", "world");
+result = efemem.get("hello");
+```
 
 
 
@@ -46,11 +60,13 @@ These are the main features of **EFEMem DB**:
 - **Easy to install.** 
 - **No third-party dependencies.** All the code is own.
 - **Ultra-fast read and write access** (few nanoseconds).
+- **Direct usage on the scope of your web application**, without calls to APIs.
+- **Performance improvement on your server applications,** accessing fastly to your most frequently data or managing data on real time.
 - **Hot configuration.** You can change configuration while **EFEMem DB** is running.
-- **Recycling mode data.** You can use this mode in order to contain a maximum number of keys. For example, you can store the 1000 last logs or requests or any other data. When the bucket is full, the next key will be added to the bottom after the first key (the oldest) is deleted.
+- **Recycling mode data.** You can use this mode in order to contain a maximum number of keys. For example, you can store the 1000 last logs or requests or any other data. When the space is full, the next key will be added to the bottom after the first key (the oldest) is deleted.
 - **Life time key.** You can define the life time of a given key. For example, you can create a key that expires in 30 seconds.
 - **Powerful commands.** You can control the data with a few and easy commands.
-- **Persistence.** The data can be saved into disk and restore it when you want.
+- **Persistence.** The data can be permantely saved (into **files** disk on server side, or into **localStorage** browser), and restore it when you want.
 - **NoSQL.** You don't need complex relationships between tables, or strict schemas. You use key-value pairs.
 - **Space names.** You can organize your keys using space names. You can use keys with the same name, but unique in different spaces.
 - **Rich data.** You can use different types of data:
@@ -65,31 +81,105 @@ These are the main features of **EFEMem DB**:
 
 ### Best usage
 
-You can use this amazing data base in your NodeJS, as a complementary database for highly and immediate availability of data, such as real-time monitoring, recycled logs, cache, configuration, master data, etc.
+#### Server side
 
-You also can use **EFEMem DB** in your web applications, without need to call remote, heavy and slow APIs, storing and retrieving data for local web purposes. It's ideally for PWAs.
+You can use this amazing data base in your **NodeJS**, as a complementary database for highly and immediate availability of data, such as real-time monitoring, recycled logs, cache, configuration, master data, etc. It's ideally for the following cases:
 
-
-
-## EFEMem DB in NodeJS
-
-### Installation
-
-The recommended installation of EFEMem DB is via `npm`:
-
-`npm install efememdb -save`
+- Master data. Avoid constant queries to master data
+- Data in real-time: Monitoring.
+- Cycling logs.
+- Frequently data accessed. Caches.
+- IoT projects
 
 
 
-After that, you can use **EFEMem DB** in your code importing the `efemem` object:
+#### Front side
 
-`const { efememdb } = require('efememdb');`
+You can use **EFEMem DB** in your web applications, without need to call remote, heavy and slow APIs, storing and retrieving data for local web purposes. It's ideally for the following cases:
+
+- Data management when the connection is off, assuring the high availability of your app until the connection is recovered. This feature is ideal for mobile applications, PWAs and web applications in general.
+- Local configuration storage that can be changed.
+- Sessions management.
+- Local data managed exclusively by your web app.
+- HTML games
 
 
 
-You can install manually **EFEMem DB** easily, copying the directory in your NodeJS project. Then, you can import the `efemem` object with this line:
 
-`const { efemem } = require('install_path/efememdb.js');`
+
+## Installation
+
+### NodeJS
+
+The recommended installation of **EFEMem DB** is via `npm` installation package:
+
+```javascript
+npm install efememdb -save
+```
+
+
+
+### Web applications
+
+Copy the file `efememdb.js` on your project. This file contains itself all the functionalities that are required by **EFEMem DB**.
+
+
+
+
+
+## First steps
+
+Once you installed **EFEMem DB** in your project, the first step is import the `efemem` object.
+
+If you are using **EFEMem DB** on NodeJS:
+
+```javascript
+const { efemem } = require('efememdb');
+```
+
+
+
+If you are using **EFEMem DB** on a web project:
+
+<script src="path/efememdb.js"></script>
+
+
+
+The `efemem` object allows you to execute directly the **EFEMem DB** commands, through which you can interact with the data.
+
+```javascript
+let result = efemem.command(<parameters>)
+```
+
+
+
+Each command returns a result, commonly with this format:
+
+```json
+{
+  "ok": true|false,
+  "cmd": "command",
+  "data": data,
+  "msg": "result_message",
+  "affected": num_affected,
+  "time": "execution_time"
+}
+```
+
+
+
+Where:
+
+- **`ok`**: Returns true if the command has been executed successfully. Returns false if any issue of error has been detected in the execution.
+- **`cmd`**: Name of the executed command
+- **`data`**: Data used or result data (depending on the command)
+- **`msg`**: Message or description about the result.
+- **`affected`**: Number of items affected by the command (0 if error or incident)
+- **`time`**: Time used by the command in its execution
+
+
+
+**Note:** *Depending of the command, this format can vary.* 
 
 
 
@@ -141,9 +231,10 @@ Each value is associated to an unique key. You can use different types of values
 
 You can define a key using this command:
 
-`efemem.set("language:en", "English");`
-
-`efemem.set("language:es", "Spanish");`
+```javascript
+efemem.set("language:en", "English");
+efemem.set("language:es", "Spanish");
+```
 
 
 
@@ -151,9 +242,10 @@ By default, **EFEMem DB** uses the space name `'public'` in order to store the k
 
 A good practice is to organize the keys under an explicit space name:
 
-`efemem.set("language:en", "English", "languages");`
-
-`efemem.set("language:es", "Spanish", "languages");`
+```javascript
+efemem.set("language:en", "English", "languages");
+efemem.set("language:es", "Spanish", "languages");
+```
 
 
 
@@ -161,9 +253,10 @@ Now, the keys are more easily to remember for search them, because we know the s
 
 Remember: you can use complex data as value:
 
-`efemem.set("student:001", {name: "James", surname: "Gordon", job: "Police inspector"}, "students");`
-
-`efemem.set("califications", [4.5, 5.5, 6.2, 9, 7.3], "students");`
+```javascript
+efemem.set("student:001", {name: "James", surname: "Gordon", job: "Police inspector"}, "students");
+efemem.set("califications", [4.5, 5.5, 6.2, 9, 7.3], "students");
+```
 
 
 
@@ -171,7 +264,11 @@ Remember: you can use complex data as value:
 
 You can retrieve a value through its key, using the following command:
 
-`efemem.get("language:en", "languages");`
+```javascript
+efemem.get("language:en", "languages");
+```
+
+
 
 The space name is optional, but is highly recommend its usage. If you don't use a space name, **EFEMem DB** assumes the `'public'` space name by default.
 
@@ -181,7 +278,11 @@ The space name is optional, but is highly recommend its usage. If you don't use 
 
 You can remove a value through its key, using the following command:
 
-`efemem.delete("language:en", "languages");`
+```javascript
+efemem.delete("language:en", "languages");
+```
+
+
 
 The space name is optional, but is highly recommend its usage. If you don't use a space name, **EFEMem DB** assumes the `'public'` space name by default.
 
@@ -193,7 +294,9 @@ When you are using extensively the database, you will have many keys. Using spac
 
 If you want to remember the space names that you are using, simply execute the following command:
 
-`efemem.spaces();`
+```javas
+efemem.spaces();
+```
 
 
 
@@ -201,17 +304,19 @@ If you want to remember the space names that you are using, simply execute the f
 
 You can list all the keys using any of the following command:
 
-`efemem.keys();`
-
-`efemem.keys("");`
-
-`efemem.keys("*");`
+```javascript
+efemem.keys();
+efemem.keys("");
+efemem.keys("*");
+```
 
 
 
 If you have many keys, it will be more easily and efficient specifying the space name:
 
-`efemem.keys("", "languages");`
+```javascript
+efemem.keys("", "languages");
+```
 
 
 
@@ -244,7 +349,9 @@ For example: imagine you have space names that identify courses for each country
 
 The following command will retrieve all the keys for the course ID 002 in all countries:
 
-`efemem.keys("course:002", "courses");`
+```javascript
+efemem.keys("course:002", "courses");
+```
 
 
 
@@ -254,63 +361,88 @@ You can retrieve the values filtering the keys in the same way you can do with t
 
 The `keys()` command and the `values()` command works in the same way. The difference is the result. `keys()` command returns the list of keys and space names, meanwhile `values()` command returns the full data about the value, key and space.
 
+
+
 **Examples:**
 
-`result = efemem.keys("", "config");`
-
-`console.log(result: ${JSON.stringify(result, null, 2)});`
-
-`result: {`
-  `"ok": true,`
-  `"cmd": "keys()",`
-  `"data": [`
-    `{`
-      `"space": "config",`
-      `"key": "maxValue"`
-    `},`
-    `{`
-      `"space": "config",`
-      `"key": "minValue"`
-    `}`
-  `],`
-  `"msg": "Keys for '' and space 'config' patterns retrieved successfully",`
-  `"affected": 2,`
-  `"time": "0s 0.071ms (71499 nanoseconds)"`
-`}`
+```javascript
+result = efemem.keys("", "config");
+```
 
 
 
+```json
+result: {
+  "ok": true,
+  "cmd": "keys()",
+  "data": [
+    {
+      "space": "config",
+      "key": "maxValue"
+    },
+    {
+      "space": "config",
+      "key": "minValue"
+    }
+  ],
+  "msg": "Keys for '' and space 'config' patterns retrieved successfully",
+  "affected": 2,
+  "time": "0s 0.071ms (71499 nanoseconds)"
+}
+```
 
 
-`result = efemem.values("", "config");`
-`console.log(result: ${JSON.stringify(result, null, 2)});`
 
-`result: {`
-  `"ok": true,`
-  `"cmd": "values()",`
-  `"data": [`
-    `{`
-      `"key": "maxValue",`
-      `"space": "config",`
-      `"value": {`
-        `"value": 100,`
-        `"due": "9999-12-31T22:59:59.000Z",`
-        `"updated": "2020-04-10T16:09:58.380Z",`
-        `"created": "2020-04-10T16:09:58.380Z"`
-      `}`
-    `},`
-    `{`
-      `"key": "minValue",`
-      `"space": "config",`
-      `"value": {`
-        `"value": 1,`
-        `"due": "9999-12-31T22:59:59.000Z",`
-        `"updated": "2020-04-10T16:09:58.381Z",`
-        `"created": "2020-04-10T16:09:58.381Z"`
-      `}`
-    `}`
-  `],`
-  `"msg": "2 values found and retrieved for Key '' in space 'config'",`
-  `"affected": 2,`
-  `"time": "0s 0.713ms (713100 nanoseconds)"`
-`}`
+
+
+```javascript
+result = efemem.values("", "config");
+```
+
+
+
+```json
+result: {
+  "ok": true,
+  "cmd": "values()",
+  "data": [
+    {
+      "key": "maxValue",
+      "space": "config",
+      "value": {
+        "value": 100,
+        "due": "9999-12-31T22:59:59.000Z",
+        "updated": "2020-04-10T16:09:58.380Z",
+        "created": "2020-04-10T16:09:58.380Z"
+      }
+    },
+    {
+      "key": "minValue",
+      "space": "config",
+      "value": {
+        "value": 1,
+        "due": "9999-12-31T22:59:59.000Z",
+        "updated": "2020-04-10T16:09:58.381Z",
+        "created": "2020-04-10T16:09:58.381Z"
+      }
+    }
+  ],
+  "msg": "2 values found and retrieved for Key '' in space 'config'",
+  "affected": 2,
+  "time": "0s 0.713ms (713100 nanoseconds)"
+}
+```
+
+
+
+## More information
+
+**You can read the full documentation at:**
+
+[https://github.com/efememdb/EFEMemDB/blob/master/docs/index.md](https://github.com/efememdb/EFEMemDB/blob/master/docs/index.md)
+
+
+
+**History changes at:**
+
+[https://github.com/efememdb/EFEMemDB/blob/master/docs/HISTORY.md](https://github.com/efememdb/EFEMemDB/blob/master/docs/HISTORY.md)

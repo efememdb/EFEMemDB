@@ -54,6 +54,8 @@ try {
 // Main constants
 const KEY_MAX_LENGTH = 100;
 const SPACE_MAX_LENGTH = 24;
+const VALID_KEY = /[^0-9a-zA-Z|#:_.]+/g;
+const VALID_SPACE = /[^0-9a-zA-Z]+/g;
 
 // EFEMemDB class
 // Properties:
@@ -72,11 +74,9 @@ const SPACE_MAX_LENGTH = 24;
 //   - get()
 //   - values()
 //   - delete()
-//   - deleteIndex() => Internal usage
 //   - rename()
 //   - move()
 //   - stats()
-//   - getKeyDetail() => Internal usage
 //   - memory()
 //   - getConfig()
 //   - setConfig()
@@ -182,7 +182,7 @@ class EFEMemDB {
     let validation = validateEntity(
       space,
       SPACE_MAX_LENGTH,
-      new RegExp(/[^0-9a-zA-Z]+/g)
+      new RegExp(VALID_SPACE)
     );
 
     if (!validation.ok)
@@ -195,11 +195,7 @@ class EFEMemDB {
       };
 
     // Validate key name
-    validation = validateEntity(
-      key,
-      KEY_MAX_LENGTH,
-      new RegExp(/[^0-9a-zA-Z|#:_.]+/g)
-    );
+    validation = validateEntity(key, KEY_MAX_LENGTH, new RegExp(VALID_KEY));
 
     if (!validation.ok)
       return {
@@ -251,7 +247,7 @@ class EFEMemDB {
             affected: 0,
           };
         // else recycling mode, deletes the first key
-        else this.deleteIndex(0);
+        else deleteIndex(0);
 
       data.created = now;
 
@@ -381,11 +377,7 @@ class EFEMemDB {
         msg: "Error: No key provided",
       };
 
-    let validation = validateEntity(
-      key,
-      KEY_MAX_LENGTH,
-      new RegExp(/[^0-9a-zA-Z|#:_.]+/g)
-    );
+    let validation = validateEntity(key, KEY_MAX_LENGTH, new RegExp(VALID_KEY));
 
     if (!validation.ok)
       return {
@@ -396,7 +388,7 @@ class EFEMemDB {
     validation = validateEntity(
       space,
       SPACE_MAX_LENGTH,
-      new RegExp(/[^0-9a-zA-Z]+/g)
+      new RegExp(VALID_SPACE)
     );
 
     if (!validation.ok)
@@ -445,7 +437,7 @@ class EFEMemDB {
 
     // If due time is over
     if (this.data[checked.pos].due < now) {
-      this.deleteIndex(checked.pos); // delete key
+      deleteIndex(checked.pos); // delete key
 
       return {
         ok: true,
@@ -555,9 +547,9 @@ class EFEMemDB {
         time: finishTime(start),
       };
 
-    const data = this.getKeyDetail(checked.pos);
+    const data = getKeyDetail(checked.pos);
 
-    this.deleteIndex(checked.pos);
+    deleteIndex(checked.pos);
 
     return {
       ok: true,
@@ -568,24 +560,6 @@ class EFEMemDB {
       time: finishTime(start),
     };
   } // function delete()
-
-  /**
-   * Deletes the key and values located on a given index
-   * @param {int} idx => Index of element to be deleted
-   * @returns Nothing
-   */
-  deleteIndex(idx) {
-    if (idx >= 0 && idx < this.spkeys.length) {
-      delete this.spkeys[idx];
-      this.spkeys = this.spkeys.filter((val) => {
-        return val != null;
-      });
-      delete this.data[idx];
-      this.data = this.data.filter((val) => {
-        return val != null;
-      });
-    }
-  } // function deleteIndex()
 
   /**
    * Renames a given key
@@ -621,7 +595,7 @@ class EFEMemDB {
     let validation = validateEntity(
       newKey,
       KEY_MAX_LENGTH,
-      new RegExp(/[^0-9a-zA-Z|#:_.]+/g)
+      new RegExp(VALID_KEY)
     );
 
     if (!validation.ok)
@@ -659,22 +633,24 @@ class EFEMemDB {
 
     if (space == undefined || space == null || space == "") space = "public";
 
-    const checked = this.check(key, space);
+    // Validate if exists the origin space and key
+    let originChecked = this.check(key, space);
 
-    if (!checked.ok)
+    if (!originChecked.ok)
       return {
         ok: false,
         cmd: "move()",
         data: {},
-        msg: checked.msg,
+        msg: originChecked.msg,
         affected: 0,
         time: finishTime(start),
       };
 
+    // Validate the space destination
     let validation = validateEntity(
       newSpace,
       SPACE_MAX_LENGTH,
-      new RegExp(/[^0-9a-zA-Z]+/g)
+      new RegExp(VALID_SPACE)
     );
 
     if (!validation.ok)
@@ -687,13 +663,18 @@ class EFEMemDB {
         time: finishTime(start),
       };
 
-    // Change key name
-    this.spkeys[checked.pos] = `${newSpace}@${key}`;
+    // If new key/space already exists, delete it
+    let destinationChecked = this.check(key, newSpace);
+
+    if (destinationChecked.ok) deleteIndex(destinationChecked.pos);
+
+    // Change the current key/space
+    this.spkeys[originChecked.pos] = `${newSpace}@${key}`;
 
     return {
       ok: true,
       cmd: "move()",
-      data: this.data[checked.pos].value,
+      data: this.data[originChecked.pos].value,
       msg: `Key '${key}' at space '${space}' was moved to space '${newSpace}'`,
       affected: 1,
       time: finishTime(start),
@@ -701,103 +682,228 @@ class EFEMemDB {
   } // function move()
 
   /**
-   * Get statistics about the use of EFEMem DB
+   * Copies a given key from a given space to another space
+   * @param {string} key => Key name
+   * @param {string} space => Space name (origin. 'public' as default)
+   * @param {string} newKey  => New key name (destination. The same, as default)
+   * @param {string} newSpace  => New space name (destination. 'public' as default)
+   * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
-  stats() {
+  copy(key, space, newKey, newSpace = "public") {
+    const start = new Date();
+
+    if (newKey == undefined || newKey == null || newKey == "") newKey = key;
+
+    if (space == undefined || space == null || space == "") space = "public";
+
+    // Validate the origin space and key
+    const checked = this.check(key, space);
+
+    if (!checked.ok)
+      return {
+        ok: false,
+        cmd: "copy()",
+        data: {},
+        msg: `Origin key - ${checked.msg}`,
+        affected: 0,
+        time: finishTime(start),
+      };
+
+    // Validate the key destination
+    let validation = validateEntity(
+      newKey,
+      KEY_MAX_LENGTH,
+      new RegExp(VALID_KEY)
+    );
+
+    if (!validation.ok)
+      return {
+        ok: false,
+        cmd: "move()",
+        data: {},
+        msg: `Error on destination key: ${validation.msg}`,
+        affected: 0,
+        time: finishTime(start),
+      };
+
+    // Validate the space destination
+    validation = validateEntity(
+      newSpace,
+      SPACE_MAX_LENGTH,
+      new RegExp(VALID_SPACE)
+    );
+
+    if (!validation.ok)
+      return {
+        ok: false,
+        cmd: "copy()",
+        data: {},
+        msg: `Error on destination space: ${validation.msg}`,
+        affected: 0,
+        time: finishTime(start),
+      };
+
+    // Validate if origin and destination are equal
+    if (key == newKey && space == newSpace) {
+      return {
+        ok: false,
+        cmd: "copy()",
+        data: {},
+        msg: "No key copied. Origin and destination are the same",
+        affected: 0,
+        time: finishTime(start),
+      };
+    }
+
+    // Copy key from origin to destination
+    let origin = this.get(key, space);
+
+    this.set(newKey, origin.data.value, newSpace);
+
+    // update dates into destination
+    const pos = this.spkeys.indexOf(`${newSpace}@${newKey}`);
+    this.data[pos].due = origin.data.due;
+    this.data[pos].created = origin.data.created;
+    this.data[pos].updated = origin.data.updated;
+
+    return {
+      ok: true,
+      cmd: "copy()",
+      data: this.data[checked.pos].value,
+      msg: `Key '${key}' at space '${space}' was copied to key '${newKey}' at space '${newSpace}'`,
+      affected: 1,
+      time: finishTime(start),
+    };
+  } // function move()
+
+  /**
+   *  Calculates some statistics operations over the keys matched with the patterns passed as parameters
+   * @param {string} key => Optional. Pattern of the name of key (all by default)
+   * @param {string} space => Optional. Pattern of the name of space (all by default)
+   */
+  stats(key, space) {
+    const start = new Date();
+
+    if (key === undefined || key === null || key === "*") key = "";
+
+    if (space === undefined || space === null || space === "*") space = "";
+
+    let sum = 0,
+      min = Number.MAX_VALUE,
+      max = Number.MIN_VALUE,
+      count = 0,
+      avg = 0,
+      variance = 0,
+      std = 0,
+      idx = 0;
+
+    let values = [];
+
+    // Spaces and keys loop
+    for (const item of this.spkeys) {
+      const spkey = item.split("@");
+      const spacex = spkey[0];
+      const keyx = spkey[1];
+
+      // if space and key found
+      if (spacex.indexOf(space) >= 0 && keyx.indexOf(key) >= 0) {
+        let value = this.data[idx].value;
+
+        if (!isNaN(value) && typeof value != "boolean") {
+          value = Number(value);
+          values.push(value);
+          count++;
+          sum += value;
+          if (value < min) min = value;
+          if (value > max) max = value;
+        }
+      } // If space & key found
+
+      idx++;
+    } // map
+
+    // Calculate de average
+    avg = sum / count;
+
+    // Calculate the variance
+    for (const item of values)
+      variance = variance + (item - avg) * (item - avg);
+
+    variance = variance / (count - 1);
+
+    return {
+      ok: true,
+      cmd: "stats()",
+      data: {
+        count: count,
+        sum: sum,
+        min: min,
+        max: max,
+        avg: avg,
+        var: variance,
+        std: Math.sqrt(variance),
+      },
+      msg: `Statistics for '${key}' and space '${space}' patterns retrieved successfully`,
+      affected: count,
+      time: finishTime(start),
+    };
+  }
+
+  /**
+   * Get statistics about an space
+   */
+  spaceInfo(space = "public") {
     const start = new Date();
 
     // Get spaces
     const spaces = this.spaces();
 
-    // Prepare data
-    let keySize = 0;
-    let dataSize = 0;
-    let dbSize = 0;
-
-    let result = {
-      totalSpaces: spaces.data.length,
-      totalKeys: this.spkeys.length,
-      time: "",
-      keySize: 0,
-      dataSize: 0,
-      dbSize: 0,
-      totalSize: 0,
-      spaces: [],
-    };
-
-    // For each space name
-    for (const space of spaces.data) {
-      // Get keys for the current space
-      const keys = this.keys("*", space);
-
-      // Counters
-      let vsize = 0;
-      let dsize = 0;
-      let ksize = 0;
-
-      // For each key
-      for (const key of keys.data) {
-        // Get value
-        const value = this.get(key.key, space);
-
-        // update the size on counters
-        ksize += getValueSize(key);
-        vsize += getValueSize(value.data.value);
-        dsize += getValueSize(value.data);
-      }
-
-      keySize += ksize;
-      dataSize += vsize;
-      dbSize += dsize;
-
-      // Space statistics
-      result.spaces.push({
-        spaceName: space,
-        spaceKeys: keys.data.length,
-        spaceKeySize: ksize,
-        spaceDataSize: vsize,
-        spaceDBSize: dsize - vsize,
-        spaceTotalSize: ksize + vsize + (dsize - vsize),
-      });
-    } // for()
-
-    // General statistics
-    result.keySize = keySize;
-    result.dataSize = dataSize;
-    result.dbSize = dbSize - dataSize;
-    result.totalSize = result.keySize + result.dataSize + result.dbSize;
-    result.time = finishTime(start);
-
-    return result;
-  } // function stats()
-
-  /**
-   * Gets the key detail info from its index position
-   * @param {int} index => Index position of the key
-   * @returns {JSON} => {key, space, value, due, createdAt, updatedAt}
-   */
-  getKeyDetail(index) {
-    if (index < 0 || index >= this.spkeys.length)
+    if (spaces.data.indexOf(space) < 0)
       return {
-        key: "",
-        value: {},
-        space: "",
-        due: "",
-        createdAt: "",
-        updatedAt: "",
+        ok: false,
+        cmd: "spaceInfo()",
+        data: {},
+        msg: `Error: Space '${space}' not found`,
+        affected: 0,
+        time: finishTime(start),
       };
 
-    const spaceKey = this.spkeys[index].split("@");
+    // Prepare data
+    let valuesSize = 0;
+    let spaceSize = 0;
+    let numKeys = 0;
+
+    // Get keys for the current space
+    const values = this.values("*", space);
+
+    // For each key
+    for (const value of values.data) {
+      numKeys++;
+      valuesSize += getValueSize(value.value);
+      spaceSize +=
+        getValueSize(value.due) +
+        getValueSize(value.created) +
+        getValueSize(value.updated) +
+        getValueSize(value.key) +
+        getValueSize(value.space) +
+        1;
+    }
 
     return {
-      key: spaceKey[1],
-      space: spaceKey[0],
-      value: this.data[index].value,
-      due: this.data[index].due,
-      created: this.data[index].created,
-      updated: this.data[index].updated,
+      ok: true,
+      cmd: "spaceInfo()",
+      data: {
+        space: space,
+        keys: numKeys,
+        valuesSize: valuesSize,
+        spaceSize: spaceSize,
+        totalSize: valuesSize + spaceSize,
+      },
+      msg: `Space '${space}' information retrieved successfully`,
+      affected: numKeys,
+      time: finishTime(start),
     };
-  } // function getKeyDetail()
+  } // function spaceInfo()
 
   /**
    * Gets the size used: key size + value size + db size
@@ -868,7 +974,7 @@ class EFEMemDB {
     let validation = validateEntity(
       param,
       SPACE_MAX_LENGTH,
-      new RegExp(/[^0-9a-zA-Z]+/g)
+      new RegExp(VALID_SPACE)
     );
 
     if (!validation.ok)
@@ -976,7 +1082,7 @@ class EFEMemDB {
                 value: value.value,
                 created: value.created,
                 updated: value.updated,
-                key: value.due,
+                due: value.due,
               },
             };
 
@@ -1277,9 +1383,54 @@ const getRandomKey = (size = 16) => {
     result += String.fromCharCode(ascii);
   }
 
-  console.log(result);
   return result;
 }; // getRandomKey() function
+
+/**
+ * Deletes the key and values located on a given index
+ * @param {int} idx => Index of element to be deleted
+ * @returns Nothing
+ */
+const deleteIndex = (idx) => {
+  if (idx >= 0 && idx < efemem.spkeys.length) {
+    delete efemem.spkeys[idx];
+    efemem.spkeys = efemem.spkeys.filter((val) => {
+      return val != null;
+    });
+    delete efemem.data[idx];
+    efemem.data = efemem.data.filter((val) => {
+      return val != null;
+    });
+  }
+}; // function deleteIndex()
+
+/**
+ * Gets the key detail info from its index position
+ * @param {int} index => Index position of the key
+ * @returns {JSON} => {key, space, value, due, createdAt, updatedAt}
+ */
+const getKeyDetail = (index) => {
+  if (index < 0 || index >= efemem.spkeys.length)
+    return {
+      key: "",
+      value: {},
+      space: "",
+      due: "",
+      createdAt: "",
+      updatedAt: "",
+    };
+
+  const spaceKey = efemem.spkeys[index].split("@");
+
+  return {
+    key: spaceKey[1],
+    space: spaceKey[0],
+    value: efemem.data[index].value,
+    due: efemem.data[index].due,
+    created: efemem.data[index].created,
+    updated: efemem.data[index].updated,
+  };
+}; // function getKeyDetail()
 
 const efemem = new EFEMemDB();
 

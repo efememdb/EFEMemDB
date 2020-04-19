@@ -82,7 +82,7 @@ result = efemem.set("maxValue", 100, "config");
 evaluate(`set("maxValue", 100, "config")`, result, true);
 
 // Testing set(). key="salary", value=1234.56. space="employees"  (float value)
-result = efemem.set("salary", "1234.56", "employees");
+result = efemem.set("salary", 1234.56, "employees");
 evaluate(`set("salary", 1234.56, "employees")`, result, true);
 
 // Testing set(). key="job", value="IT Developer". space="employees"  (text value)

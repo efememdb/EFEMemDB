@@ -104,6 +104,20 @@
 
         document.getElementById("move").innerHTML = content;
 
+        // Copy key 'salary' from 'public' space to 'employees' space
+        content = "<h2>copy()</h2>";
+        result = efemem.copy("salary", "public", "salary", "employees");
+        console.log(`copy: ${JSON.stringify(result, null, 2)}`);
+        content +=
+          "<p><code>" + JSON.stringify(result, null, 2) + "</code></p>";
+
+        result = efemem.values("salary");
+        console.log(`'salary' values: ${JSON.stringify(result, null, 2)}`);
+        content +=
+          "<p><code>" + JSON.stringify(result, null, 2) + "</code></p>";
+
+        document.getElementById("copy").innerHTML = content;
+
         // Delete key 'job' from 'employees' space
         result = efemem.delete("job", "employees");
         console.log(`Delete: ${JSON.stringify(result, null, 2)}`);
@@ -139,7 +153,7 @@
 
         document.getElementById("final").innerHTML = content;
 
-        // Statistics
+        // Memory
         result = efemem.memory();
         console.log(`Memory: ${JSON.stringify(result, null, 2)}`);
         document.getElementById("memory").innerHTML =
@@ -147,11 +161,37 @@
           JSON.stringify(result, null, 2) +
           "</code>";
 
+        // Prepare data for statistics
+        efemem.set("student:001|class:Python", 9.7, "qualifications");
+        efemem.set("student:002|class:Python", 7.5, "qualifications");
+        efemem.set("student:003|class:Python", 6.7, "qualifications");
+        efemem.set("student:001|class:JavaScript", 8.7, "qualifications");
+        efemem.set("student:002|class:JavaScript", 6.6, "qualifications");
+        efemem.set("student:003|class:JavaScript", 8.3, "qualifications");
+        efemem.set("student:001|class:Java", "9.2", "qualifications");
+        efemem.set("student:002|class:Java", "9.5", "qualifications");
+        efemem.set("student:003|class:Java", "8.9", "qualifications");
+        efemem.set("student:005|class:Python", 5.8, "qualifications");
+
+        // Statistics for Python
+        result = efemem.stats("Python");
+        console.log(`Python Statistics: ${JSON.stringify(result, null, 2)}`);
+
         // Statistics
         result = efemem.stats();
         console.log(`Statistics: ${JSON.stringify(result, null, 2)}`);
         document.getElementById("stats").innerHTML =
           "<h2>stats()</h2><code>" +
+          JSON.stringify(result, null, 2) +
+          "</code>";
+
+        // Space 'qualifications' information
+        result = efemem.spaceInfo("qualifications");
+        console.log(
+          `spaceInfo 'qualifications': ${JSON.stringify(result, null, 2)}`
+        );
+        document.getElementById("spaceInfo").innerHTML =
+          "<h2>spaceInfo()</h2><code>" +
           JSON.stringify(result, null, 2) +
           "</code>";
 
@@ -190,10 +230,12 @@
     <div id="values"></div>
     <div id="rename"></div>
     <div id="move"></div>
+    <div id="copy"></div>
     <div id="delete"></div>
     <div id="final"></div>
     <div id="memory"></div>
     <div id="stats"></div>
+    <div id="spaceInfo"></div>
     <div id="persist"></div>
     <div id="restore"></div>
     <div id="values2"></div>
