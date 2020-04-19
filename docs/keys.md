@@ -4,7 +4,7 @@
 
 A key is an unique name that identifies exclusively a value. If you use the same key for two values, only a key-value is available (the last one).
 
-**EFEMem database** provides you the space name feature. You can group your keys into spaces names for an easy and efficient organization. Also, the space name defines an scope of keys, which means that you can define repetated key names, but only unique key names on each space name. For example, you can define a key named **maxValue** into the space **config**, and other key also named **maximumValue** into the space **sales**.
+**EFEMem Database** provides you the space name feature. You can group your keys into spaces names for an easy and efficient organization. Also, the space name defines an scope of keys, which means that you can define repetated key names, but only unique key names on each space name. For example, you can define a key named **maxValue** into the space **config**, and other key also named **maximumValue** into the space **sales**.
 
 You can locate and access quickly to the values using the key names. **EFEMem Database** allows you to filter and find easily the keys through efficient commands.
 
@@ -25,9 +25,9 @@ The rules for a key name are the following:
 
 Correct key names could be the following:
 
-- **maximumValue**
-- **course|English|2020**
-- **student:001|city:020**
+- **`maximumValue`**
+- **`course|English|2020`**
+- **`student:001|city:020`**
 
 
 
@@ -35,6 +35,18 @@ The key must be a set of relevant information, that helps you to find and identi
 
 Incorrect key names example are the following:
 
-- **course English** (space is not allowed)
-- **2020course** (first character cannot be numeric)
-- **student:001@city:020** (character @ is not allowed)
+- **`course English`** (space is not allowed)
+- **`2020course`** (first character cannot be numeric)
+- **`student:001@city:020`** (character @ is not allowed)
+
+
+
+## See also
+
+- [Spaces](spaces.md)
+- [Values](values.md)
+- [keys() command](command-keys.md)
+
+
+
+[Go to index](index.md)
