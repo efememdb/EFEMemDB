@@ -3,7 +3,7 @@
 efememdb.js
 
 Easy, Fast and Efficient MEMory NoSQL DataBase
-Version 1.0.5
+Version 1.0.7
 
 Created by Rafael Hernamperez and released under the terms of the ISC License:
 https://opensource.org/licenses/ISC
