@@ -1,6 +1,6 @@
 const { efemem } = require("../efememdb");
 
-const NUM_KEYS = 7;
+const NUM_KEYS = 8;
 
 console.log("\n\n************************");
 console.log("Testing command values()");

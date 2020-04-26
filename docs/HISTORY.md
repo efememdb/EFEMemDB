@@ -1,5 +1,23 @@
 # Change log
 
+## 1.0.8 (2020-05-03)
+
+### Features
+
+- Key names by default. If you `set()` a value without a key, a hash value will be assumed as the name of the key. This hash value will contain 24 characters in hexadecimal format, and will assure the key name will be unique and irrepetible.
+- Error results are now minimalists: `{ok: false, cmd: "command()", msg: "error message"}`
+- Results returns the complete command syntax
+- Initial memory size reduced to 10MB
+
+
+
+### Fixes
+
+- Code more stable, thanks to more exceptions control
+- `check()` command result fixed
+
+
+
 ## 1.0.7 (2020-04-19)
 
 ### Fixes

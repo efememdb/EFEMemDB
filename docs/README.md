@@ -31,12 +31,14 @@ You can also run **EFEMem DB** on server side applications, using technologies b
 
 With a few and very easy commands, you can take the control of your data.
 
-```javascript
+```html
 // Web application example
-const { efemem } = require('path/efememdb.js');
+<script src="uri/efememdb.js"></script>
 
-let result = efemem.set("hello", "world");
-result = efemem.get("hello");
+<script>
+   let result = efemem.set("hello", "world");
+   result = efemem.get("hello");
+</script>
 ```
 
 
@@ -90,6 +92,7 @@ You can use this amazing data base in your **NodeJS**, as a complementary databa
 - Cycling logs.
 - Frequently data accessed. Caches.
 - IoT projects
+- Temporary data
 
 
 
@@ -102,6 +105,7 @@ You can use **EFEMem DB** in your web applications, without need to call remote,
 - Sessions management.
 - Local data managed exclusively by your web app.
 - HTML games
+- Temporary data
 
 
 

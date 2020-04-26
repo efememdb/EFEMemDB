@@ -30,7 +30,7 @@ const evaluate = (title, result, expected) => {
 result = efemem.set("hello", "world");
 evaluate(`set("hello", "world)`, result, true);
 
-// Testing if error. set() without parameters
+// Testing if error. set() without parameters (no value provided)
 result = efemem.set();
 evaluate(` efemem.set()`, result, false);
 
@@ -38,10 +38,10 @@ evaluate(` efemem.set()`, result, false);
 result = efemem.set("maxValue");
 evaluate(`set("maxValue")`, result, false);
 
-// Testing if error. set() with incorrect key (null)
+// Testing if error. set() with incorrect key (null). By default, key hash
 result = efemem.set(null, 100);
-evaluate(`set(null, 100)`, result, false);
-
+evaluate(`set(null, 100)`, result, true);
+console.log(`result: ${JSON.stringify(result, null, 2)}`);
 // Testing if error. set() with incorrect key (no string name)
 result = efemem.set(123, 100);
 evaluate(`set(123, 100)`, result, false);

@@ -1,0 +1,10 @@
+{"key":"student:001|class:Python","space":"qualifications","data":{"value":9.7,"due":"9999-12-31T22:59:59.000Z"}}
+{"key":"student:002|class:Python","space":"qualifications","data":{"value":7.5,"due":"9999-12-31T22:59:59.000Z"}}
+{"key":"student:003|class:Python","space":"qualifications","data":{"value":6.7,"due":"9999-12-31T22:59:59.000Z"}}
+{"key":"student:001|class:JavaScript","space":"qualifications","data":{"value":8.7,"due":"9999-12-31T22:59:59.000Z"}}
+{"key":"student:002|class:JavaScript","space":"qualifications","data":{"value":6.6,"due":"9999-12-31T22:59:59.000Z"}}
+{"key":"student:003|class:JavaScript","space":"qualifications","data":{"value":8.3,"due":"9999-12-31T22:59:59.000Z"}}
+{"key":"student:001|class:Java","space":"qualifications","data":{"value":"9.2","due":"9999-12-31T22:59:59.000Z"}}
+{"key":"student:002|class:Java","space":"qualifications","data":{"value":"9.5","due":"9999-12-31T22:59:59.000Z"}}
+{"key":"student:003|class:Java","space":"qualifications","data":{"value":"8.9","due":"9999-12-31T22:59:59.000Z"}}
+{"key":"student:005|class:Python","space":"qualifications","data":{"value":5.8,"due":"9999-12-31T22:59:59.000Z"}}

@@ -70,10 +70,8 @@ The previous code will generate the following result:
 ```javascript
 result: {  
    "ok": false,  
-   "cmd": "get()",  
-   "data": {},  
+   "cmd": "get(key[,space])",  
    "msg": "Error: key 'maxValue' in space 'public' not found",  
-   "affected": 0 
 } 
 ```
 

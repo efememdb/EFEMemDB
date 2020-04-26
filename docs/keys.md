@@ -14,6 +14,7 @@ You can locate and access quickly to the values using the key names. **EFEMem Da
 
 The rules for a key name are the following:
 
+- Minimum length of 3 characters.
 - Maximum length of 100 characters.
 - You can use  alphabetical and numeric characters.
 - You can use special characters as separators. These special characters are: "|" (pipe), "#" (number), "_" (underscore), ":" (colon) and "." (period or point)
