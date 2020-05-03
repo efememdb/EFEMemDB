@@ -35,7 +35,7 @@ The configuration parameters are the following:
 ## **Examples**
 
 ```javascript
-const { efemem } = require('./efememdb.js');
+const { efemem } = require('efememdb');
 
 let result = efemem.getConfig("keysMax");
 ```

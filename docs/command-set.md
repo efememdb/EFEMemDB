@@ -62,7 +62,7 @@ set("maxValue", 100, "config", 30);  // 30 seconds key life
 This example will create a valid key into the `config` space name, with a time expiration of 30 seconds:
 
 ```javascript
-const { efemem } = require('./efememdb.js');
+const { efemem } = require('efememdb');
 
 let result = efemem.set("maxValue", 100, "config", 30);
 ```
@@ -72,8 +72,6 @@ let result = efemem.set("maxValue", 100, "config", 30);
 The following example will provoke an error, because the first character of the key name must be an alphabetical character (not a number):
 
 ```javascript
-const { efemem } = require('./efememdb.js');
-
 let result = efemem.set("7maxValue", 100, "config", 30);
 ```
 

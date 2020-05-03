@@ -19,10 +19,10 @@ const evaluate = (title, result, expected) => {
 
   if (result.ok == expected) {
     ok++;
-    console.log(`   [OK] ${result.msg}`);
+    console.log(`   [OK] ${JSON.stringify(result, null, 2)}`);
   } else {
     ko++;
-    console.log(`   *** [ERROR] *** ${result.msg}`);
+    console.log(`   *** [ERROR] *** ${JSON.stringify(result, null, 2)}`);
   }
 };
 

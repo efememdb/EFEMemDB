@@ -8,13 +8,36 @@
 - Error results are now minimalists: `{ok: false, cmd: "command()", msg: "error message"}`
 - Results returns the complete command syntax
 - Initial memory size reduced to 10MB
+- Improved memory size. `"created"` and `"updated"` fields are removed, saving up to the 50% of memory size.
+- Improved pattern keys search performance.
+- `delete()` command can remove keys using patterns.
+- Removed the following commands:
+  - `check()`
+  - `values()`
+- Improved `get()` command :
+  - Use of key patterns
+  - `fullInfo` parameter:
+    - If `true`, returns the following information:
+      - space
+      - key
+      - data:
+        - value
+        - due
+    - If `true` (by default), returns the following information:
+      - space~key
+      - value
+- Improved `remove()` command:
+  - Use of key patterns
+  - `overwrite` param:
+    - If `true`, when you move a given key to a new space, and this key and space already exists, overwrite this
+    - If `false` (by default), when you move a given key to a new space, and this key and space already exists, don't move the key, keeping both keys.
+- Improved `copy()` command. Use of key patterns, overwriting existings keys.
 
 
 
 ### Fixes
 
 - Code more stable, thanks to more exceptions control
-- `check()` command result fixed
 
 
 

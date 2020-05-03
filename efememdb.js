@@ -73,12 +73,11 @@ const VALID_SPACE = new RegExp(/[^0-9a-zA-Z]+/g);
 //   - set()
 //   - keys()
 //   - spaces()
-//   - check()
 //   - get()
-//   - values()
 //   - delete()
 //   - rename()
 //   - move()
+//   - copy()
 //   - stats()
 //   - memory()
 //   - getConfig()
@@ -87,7 +86,6 @@ const VALID_SPACE = new RegExp(/[^0-9a-zA-Z]+/g);
 //   - restore()
 //
 class EFEMemDB {
-  // Constructor
   constructor() {
     this.spkeys = [];
     this.data = [];
@@ -238,58 +236,23 @@ class EFEMemDB {
    */
   keys(key, space) {
     const start = new Date();
-    const cmd = "get([key[,space]])";
+    const cmd = "keys([key[,space]])";
+    let result = [];
+    const idxs = keysIndexes(key, space);
 
-    try {
-      if (key === undefined || key === null || key === "*") key = "";
+    idxs.forEach((idx) => {
+      const [ispace, ikey] = this.spkeys[idx].split("~");
+      result.push({ space: ispace, key: ikey });
+    });
 
-      if (space === undefined || space === null || space === "*") space = "";
-
-      let spaces = [],
-        keys = [],
-        result = [];
-
-      // Separate spaces and keys from the key (space~key)
-      for (var spaceKey of this.spkeys) {
-        const spaceKeys = spaceKey.split("~");
-        spaces.push(spaceKeys[0]);
-        keys.push(spaceKeys[1]);
-      }
-
-      spaces.map((item, idx) => {
-        if (space != "") {
-          // if space pattern provided
-          if (item.indexOf(space) >= 0) {
-            // space matching
-            if (key != "") {
-              // if not key pattern provided
-              if (keys[idx].indexOf(key) >= 0)
-                result.push({ space: item, key: keys[idx] });
-            } // key pattern provided
-            else result.push({ space: item, key: keys[idx] });
-          }
-        } else {
-          // key not provided
-          if (key != "") {
-            // if not key pattern provided
-            if (keys[idx].indexOf(key) >= 0)
-              result.push({ space: item, key: keys[idx] });
-          } // key pattern provided
-          else result.push({ space: item, key: keys[idx] });
-        }
-      }); // map()
-
-      return {
-        ok: true,
-        cmd: cmd,
-        data: result,
-        msg: `Keys for '${key}' and space '${space}' patterns retrieved successfully`,
-        affected: result.length,
-        time: finishTime(start),
-      };
-    } catch (error) {
-      return { ok: false, cmd: cmd, msg: `Error: ${error}` };
-    }
+    return {
+      ok: true,
+      cmd: cmd,
+      data: result,
+      msg: `${result.length} Keys retrieved`,
+      affected: result.length,
+      time: finishTime(start),
+    };
   } // function keys()
 
   /**
@@ -309,184 +272,73 @@ class EFEMemDB {
         if (spaces.indexOf(space) < 0) spaces.push(space);
       }
 
-      if (spaces.length > 0)
-        return {
-          ok: true,
-          cmd: cmd,
-          data: spaces.sort(),
-          msg: `${spaces.length} spaces used`,
-          affected: spaces.length,
-          time: finishTime(start),
-        };
-      else
-        return {
-          ok: true,
-          cmd: cmd,
-          data: {},
-          msg: `No space used`,
-          affected: 0,
-          time: finishTime(start),
-        };
+      return {
+        ok: true,
+        cmd: cmd,
+        data: spaces.sort(),
+        msg: `${spaces.length} spaces used`,
+        affected: spaces.length,
+        time: finishTime(start),
+      };
     } catch (error) {
       return { ok: false, cmd: cmd, msg: `Error: ${error}` };
     }
   } // function spaces()
 
   /**
-   * Checks a given key into a given space
-   * @param {string} key => Key name
-   * @param {string} space => Space name ('public' by default)
-   * @returns {JSON} => { ok: true | false, msg: "message", pos: index_position }
-   */
-  check(key, space = "public") {
-    const cmd = "check(key[,space])";
-
-    try {
-      // Validation
-      if (key == undefined || key == null || key == "")
-        return { ok: false, cmd: cmd, msg: "Error: No key provided" };
-
-      let valid = validate(ENTITY_KEY, key);
-
-      if (!valid.ok)
-        return { ok: false, cmd: cmd, msg: `Error on key: ${valid.msg}` };
-
-      valid = validate(ENTITY_SPACE, space);
-
-      if (!valid.ok) return { ok: false, msg: `Error on space: ${valid.msg}` };
-
-      const realKey = `${space}~${key}`;
-
-      const idx = this.spkeys.indexOf(realKey);
-
-      if (idx < 0)
-        return {
-          ok: false,
-          cmd: cmd,
-          msg: `Error: key '${key}' in space '${space}' not found`,
-        };
-
-      return {
-        ok: true,
-        cmd: cmd,
-        msg: `Key '${key}' found in space '${space}'`,
-        pos: idx,
-      };
-    } catch (error) {
-      return { ok: false, cmd: cmd, msg: `Error: ${error}` };
-    }
-  } // function check()
-
-  /**
    * Gets the value for a given key
    * @param {string} key => Key name
    * @param {string} space => Optional. Space name ('public' by default)
+   * @param {boolean} fullInfo => true if get full information (false by default)
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
-  get(key, space = "public") {
+  get(key, space, fullInfo = false) {
     const start = new Date();
     const cmd = "get(key[,space])";
+    const now = getLocalNow().toISOString();
+    let result = [];
+    let del = 0;
 
     try {
-      const checked = this.check(key, space);
+      const idxs = keysIndexes(key, space);
 
-      if (!checked.ok) return { ok: false, cmd: cmd, msg: checked.msg };
+      idxs.forEach((idx) => {
+        // Mark the key for deletion if due
+        if (this.data[idx].due < now) {
+          del++;
+          markForDelete(idx);
+        }
 
-      const now = getLocalNow().toISOString();
+        const [ispace, ikey] = this.spkeys[idx].split("~");
 
-      // If due time is over
-      if (this.data[checked.pos].due < now) {
-        deleteIndex(checked.pos); // delete key
+        if (fullInfo)
+          result.push({
+            space: ispace,
+            key: ikey,
+            value: this.data[idx].value,
+            due: this.data[idx].due,
+          });
+        else
+          result.push({
+            key: this.spkeys[idx],
+            value: this.data[idx].value,
+          });
+      });
 
-        return {
-          ok: true,
-          cmd: cmd,
-          data: {},
-          msg: `Key '${
-            key == undefined || key == null ? "*" : key
-          }' in space '${
-            space == undefined || space == null ? "*" : space
-          }' not found`,
-          affected: 0,
-        };
-      }
+      if (del > 0) deleteMarked();
 
       return {
         ok: true,
         cmd: cmd,
-        data: this.data[checked.pos],
-        msg: `Key '${key == undefined || key == null ? "*" : key}' in space '${
-          space == undefined || space == null ? "*" : space
-        }' found and retrieved successfully`,
-        affected: 1,
+        data: result,
+        msg: `${idxs.length} values found`,
+        affected: idxs.length,
         time: finishTime(start),
       };
     } catch (error) {
       return { ok: false, cmd: cmd, msg: `Error: ${error}` };
     }
   } // function get()
-
-  /**
-   * Get the list of values based on a pattern and/or space
-   * @param {string} key => Optional. Pattern of the name of key
-   * @param {string} space => Optional. Pattern of the name of space
-   * @returns {JSON} => { ok: true|false, cmd: 'command', data: [{values}], msg: 'message', affected: number, time: 'execution_time' }
-   */
-  values(key, space) {
-    const start = new Date();
-    const cmd = "values([key[,space]])";
-
-    try {
-      // Get key name
-      const keys = this.keys(key, space).data;
-
-      let result = [];
-
-      // for each key name
-      for (const item of keys) {
-        // if valid key name
-        if (item !== undefined && item !== null) {
-          const value = this.get(item.key, item.space);
-
-          if (value.ok && value.affected > 0) {
-            result.push({
-              key: item.key,
-              space: item.space,
-              value: value.data.value,
-              due: value.data.due,
-            });
-          }
-        } // valid item
-      } // for
-
-      // if keys found
-      if (result.length > 0)
-        return {
-          ok: true,
-          cmd: cmd,
-          data: result,
-          msg: `${result.length} values found and retrieved for Key '${
-            key == undefined || key == null ? "*" : key
-          }' in space '${space == undefined || key == null ? "*" : space}'`,
-          affected: result.length,
-          time: finishTime(start),
-        };
-
-      // No key found
-      return {
-        ok: true,
-        cmd: cmd,
-        data: {},
-        msg: `No values found for key '${
-          key == undefined || key == null ? "*" : key
-        }' in space '${space == undefined || space == null ? "*" : space}'`,
-        affected: 0,
-        time: finishTime(start),
-      };
-    } catch (error) {
-      return { ok: false, cmd: cmd, msg: `Error: ${error}` };
-    }
-  } // function values()
 
   /**
    * Deletes the value of a given key
@@ -496,22 +348,22 @@ class EFEMemDB {
    */
   delete(key, space = "public") {
     const start = new Date();
-    const cmd = "delete(key[,delete])";
+    const cmd = "delete(key[,space])";
 
     try {
-      const checked = this.check(key, space);
+      const idxs = keysIndexes(key, space);
 
-      if (!checked.ok) return { ok: false, cmd: cmd, msg: checked.msg };
+      idxs.forEach((idx) => {
+        markForDeletion(idx);
+      });
 
-      const data = getKeyDetail(checked.pos);
-
-      deleteIndex(checked.pos);
+      deleteMarked();
 
       return {
         ok: true,
         cmd: cmd,
-        ...data,
-        msg: `Key '${key}' in space '${space}' deleted successfully`,
+        data: { key: key, space: space },
+        msg: `${idxs.length} keys deleted`,
         affected: 1,
         time: finishTime(start),
       };
@@ -531,26 +383,31 @@ class EFEMemDB {
     const start = new Date();
     const cmd = "rename(key, newKey[, space])";
 
+    // Validate new key
+    if (newKey == undefined || newKey == null || newKey.length < KEY_MIN_LENGTH)
+      return { ok: false, cmd, msg: `Error: new key '${newKey}' is not valid` };
+
+    let valid = validate(ENTITY_KEY, newKey);
+
+    if (!valid.ok)
+      return { ok: false, cmd: cmd, msg: `Error on new key: ${valid.msg}` };
+
     try {
-      const checked = this.check(key, space);
+      let idxs = keysIndexes(key, space);
 
-      if (!checked.ok) return { ok: false, cmd: cmd, msg: checked.msg };
+      if (idxs.length == 0)
+        return { ok: false, cmd, msg: `Error: key '${key}' not found` };
 
-      if (newKey == undefined || newKey == null || newKey == "")
-        return { ok: false, cmd: cmd, msg: "Error: No new key provided" };
-
-      let valid = validate(ENTITY_KEY, newKey);
-
-      if (!valid.ok)
-        return { ok: false, cmd: cmd, msg: `Error on new key: ${valid.msg}` };
+      if (idxs.length > 1)
+        return { ok: false, cmd, msg: `Error: key '${key}' is not unique` };
 
       // Change key name
-      this.spkeys[checked.pos] = `${space}~${newKey}`;
+      this.spkeys[idxs[0]] = `${space}~${newKey}`;
 
       return {
         ok: true,
         cmd: cmd,
-        data: this.data[checked.pos].value,
+        data: this.data[idxs[0]].value,
         msg: `Key '${key}' at space '${space}' was renamed as '${newKey}'`,
         affected: 1,
         time: finishTime(start),
@@ -561,45 +418,61 @@ class EFEMemDB {
   } // function rename()
 
   /**
-   * Moves a given key from a given space to another space
+   * Moves keys from a given space (base on a key pattern) to another space
    * @param {string} key => Key name
-   * @param {string} space => Space name (origin. 'public' as default)
+   * @param {string} space => Space name (origin. all spaces as default)
    * @param {string} newSpace  => New space name (destination. 'public' as default)
+   * @param {boolean} overwrite => Optional. If true, when destination key exists overwrite it (false, by default)
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
-  move(key, space, newSpace = "public") {
+  move(key, space, newSpace, overwrite = false) {
     const start = new Date();
-    const cmd = "move(key, space[,newSpace])";
+    const cmd = "move(key, space[,newSpace[,overwrite]])";
+    let del = 0;
+    let kept = 0;
 
     try {
-      if (space == undefined || space == null || space == "") space = "public";
+      // Validate destination space
+      if (newSpace == undefined || newSpace == null || newSpace == "")
+        newSpace = "public";
 
-      // Validate if exists the origin space and key
-      let originChecked = this.check(key, space);
-
-      if (!originChecked.ok)
-        return { ok: false, cmd: cmd, msg: originChecked.msg };
-
-      // Validate the space destination
       let valid = validate(ENTITY_SPACE, newSpace);
 
       if (!valid.ok)
         return { ok: false, cmd: cmd, msg: `Error on new space: ${valid.msg}` };
 
-      // If new key/space already exists, delete it
-      let destinationChecked = this.check(key, newSpace);
+      const idxs = keysIndexes(key, space);
 
-      if (destinationChecked.ok) deleteIndex(destinationChecked.pos);
+      if (idxs.length == 0)
+        return { ok: false, cmd: cmd, msg: `Error: Key '${key}' not found` };
 
-      // Change the current key/space
-      this.spkeys[originChecked.pos] = `${newSpace}~${key}`;
+      idxs.forEach((idx) => {
+        const spKey = `${newSpace}~${this.spkeys[idx].split("~")[1]}`;
+
+        // Checks if destination already in use
+        const prev = this.spkeys.indexOf(spKey);
+
+        // if not previous existing destination key
+        if (prev < 0) this.spkeys[idx] = `${spKey}`;
+        else if (prev >= 0 && overwrite) {
+          // only if overwrite == true
+          del++;
+          markForDeletion(prev);
+          this.spkeys[idx] = `${spKey}`;
+        } else kept++;
+      }); // forEach()
+
+      // if old spaces were marked for deletion
+      if (del > 0) deleteMarked();
 
       return {
         ok: true,
         cmd: cmd,
-        data: this.data[originChecked.pos].value,
-        msg: `Key '${key}' at space '${space}' was moved to space '${newSpace}'`,
-        affected: 1,
+        data: { key: key, space: space, overwrite: overwrite },
+        msg: `${idxs.length - kept} of ${
+          idxs.length
+        } Keys moved to '${newSpace}'`,
+        affected: idxs.length - kept,
         time: finishTime(start),
       };
     } catch (error) {
@@ -608,59 +481,54 @@ class EFEMemDB {
   } // function move()
 
   /**
-   * Copies a given key from a given space to another space
+   * Copies a pattern key from a given space to another space
    * @param {string} key => Key name
-   * @param {string} space => Space name (origin. 'public' as default)
-   * @param {string} newKey  => New key name (destination. The same, as default)
+   * @param {string} space => Space name (origin)
    * @param {string} newSpace  => New space name (destination. 'public' as default)
    * @returns {JSON} => { ok: true|false, cmd: 'command', data: {value}, msg: 'message', affected: number, time: 'execution_time' }
    */
-  copy(key, space, newKey, newSpace = "public") {
+  copy(key, space, newSpace) {
     const start = new Date();
-    const cmd = "copy(key, space[], newKey[, newSpace]])";
+    const cmd = "copy(key, space[,newSpace])";
 
     try {
-      if (newKey == undefined || newKey == null || newKey == "") newKey = key;
+      // Validate destination space
+      if (newSpace == undefined || newSpace == null || newSpace == "")
+        newSpace = "public";
 
-      if (space == undefined || space == null || space == "") space = "public";
-
-      // Validate the origin space and key
-      const checked = this.check(key, space);
-
-      if (!checked.ok)
-        return { ok: false, cmd: cmd, msg: `Origin key - ${checked.msg}` };
-
-      // Validate the key destination
-      let valid = validate(ENTITY_KEY, newKey);
-
-      if (!valid.ok)
-        return { ok: false, cmd: cmd, msg: `Error new key: ${valid.msg}` };
-
-      // Validate the space destination
-      valid = validate(ENTITY_SPACE, newSpace);
+      let valid = validate(ENTITY_SPACE, newSpace);
 
       if (!valid.ok)
         return { ok: false, cmd: cmd, msg: `Error on new space: ${valid.msg}` };
 
-      // Validate if origin and destination are equal
-      if (key == newKey && space == newSpace)
-        return { ok: false, cmd: cmd, msg: "Error: Origin = destination" };
+      const idxs = keysIndexes(key, space);
 
-      // Copy key from origin to destination
-      let origin = this.get(key, space);
+      if (idxs.length == 0)
+        return { ok: false, cmd: cmd, msg: `Error: Key '${key}' not found` };
 
-      this.set(newKey, origin.data.value, newSpace);
+      idxs.forEach((idx) => {
+        const [ispace, ikey] = this.spkeys[idx].split("~");
+        const spKey = `${newSpace}~${ikey}`;
 
-      // update dates into destination
-      const pos = this.spkeys.indexOf(`${newSpace}~${newKey}`);
-      this.data[pos].due = origin.data.due;
+        // Checks if destination already in use
+        const prev = this.spkeys.indexOf(spKey);
+
+        // if not previous existing destination key
+        if (prev < 0) {
+          this.set(ikey, this.data[idx].value, newSpace);
+          this.data[this.data.length - 1].due = this.data[idx].due;
+        } else {
+          this.data[prev].value = this.data[idx].value;
+          this.data[prev].due = this.data[idx].due;
+        }
+      }); // forEach()
 
       return {
         ok: true,
         cmd: cmd,
-        data: this.data[checked.pos].value,
-        msg: `Key '${key}' at space '${space}' was copied to key '${newKey}' at space '${newSpace}'`,
-        affected: 1,
+        data: { key: key, space: space },
+        msg: `${idxs.length} Keys copied to '${newSpace}'`,
+        affected: idxs.length,
         time: finishTime(start),
       };
     } catch (error) {
@@ -769,7 +637,7 @@ class EFEMemDB {
       let numKeys = 0;
 
       // Get keys for the current space
-      const values = this.values("*", space);
+      const values = this.get("*", space);
 
       // For each key
       for (const value of values.data) {
@@ -915,7 +783,7 @@ class EFEMemDB {
         numSpaces++;
 
         // Get the values of all the keys from the current space
-        const values = this.values("", space);
+        const values = this.get("", space, true);
 
         // Values for web environment
         let lines = [];
@@ -1079,17 +947,11 @@ const validate = (type, entity) => {
 const validateEntity = (entity, length, regexp) => {
   // Check if the entity is a string
   if (typeof entity != "string")
-    return {
-      ok: false,
-      msg: `'${entity}' name must be a string`,
-    };
+    return { ok: false, msg: `'${entity}' name must be a string` };
 
   // Check if the entity length is correct
   if (entity.length > length)
-    return {
-      ok: false,
-      msg: `'${entity}' name is longer than ${length} characters`,
-    };
+    return { ok: false, msg: `'${entity}' name length > ${length} characters` };
 
   // Chek if the first character is alphapbetical
   let regex = new RegExp(/^[a-zA-Z]/);
@@ -1097,22 +959,53 @@ const validateEntity = (entity, length, regexp) => {
   if (!regex.test(entity))
     return {
       ok: false,
-      msg: `'${entity}' name is incorrect. First character must be alphabetical`,
+      msg: `'${entity}' incorrect. First character must be alphabetical`,
     };
 
   // Check regular expression validation
   if (regexp.test(entity))
     return {
       ok: false,
-      msg: `'${entity}' name is incorrect. Please check the use of possible illegal special characters`,
+      msg: `'${entity}' incorrect. Possible illegal special characters`,
     };
 
   // Validation is ok
-  return {
-    ok: true,
-    msg: `'${entity}' name is correct`,
-  };
+  return { ok: true, msg: `'${entity}' name is correct` };
 }; // validateEntity() function
+
+/**
+ * Get an array with indexes corresponding to keys based on a pattern and/or space
+ * @param {string} key => Optional. Pattern of the name of key
+ * @param {string} space => Optional. Pattern of the name of space
+ * @returns {array} => Array with the list of the indexes
+ */
+const keysIndexes = (key, space) => {
+  let indexes = [];
+
+  try {
+    if (key === undefined || key === null || key === "*") key = "";
+
+    if (space === undefined || space === null || space === "*") space = "";
+
+    efemem.spkeys.forEach((item, idx) => {
+      const [ispace, ikey] = item.split("~");
+
+      // No space (any space)
+      if (space === "") {
+        if (key === "") indexes.push(idx);
+        else if (ikey.indexOf(key) >= 0) indexes.push(idx);
+        // else if space coincidence
+      } else if (ispace.indexOf(space) >= 0) {
+        if (key === "") indexes.push(idx);
+        else if (ikey.indexOf(key) >= 0) indexes.push(idx);
+      }
+    }); // forEach()
+  } catch (error) {
+    console.log(error);
+  }
+
+  return indexes;
+}; // function keysIndexes()
 
 /**
  * Converts an UTC Date to Local Timezone Date
@@ -1242,21 +1135,42 @@ const getRandomKey = (size = 16) => {
 }; // getRandomKey() function
 
 /**
+ * Marks for deletion the key and values located on a given index
+ * @param {int} idx => Index of element to be marked for deletion
+ * @returns Nothing
+ */
+const markForDeletion = (idx) => {
+  delete efemem.spkeys[idx];
+  delete efemem.data[idx];
+};
+
+/**
+ * Deletes phisically the keys marked for deletion
+ */
+const deleteMarked = () => {
+  efemem.spkeys = efemem.spkeys.filter((val) => val != null);
+  efemem.data = efemem.data.filter((val) => val != null);
+};
+
+/**
  * Deletes the key and values located on a given index
  * @param {int} idx => Index of element to be deleted
  * @returns Nothing
  */
 const deleteIndex = (idx) => {
   if (idx >= 0 && idx < efemem.spkeys.length) {
-    delete efemem.spkeys[idx];
+    markForDeletion(idx);
+    deleteMarked();
+    /*delete efemem.spkeys[idx];
     efemem.spkeys = efemem.spkeys.filter((val) => {
       return val != null;
     });
     delete efemem.data[idx];
     efemem.data = efemem.data.filter((val) => {
       return val != null;
-    });
+    });*/
   }
+  console.log("");
 }; // function deleteIndex()
 
 /**

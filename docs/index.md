@@ -27,6 +27,7 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 - [Spaces](spaces.md)
 - [Keys](keys.md)
 - [Values](values.md)
+- [Pattern names](patterns.md)
 - [Change logs](HISTORY.md)
 
 
@@ -35,14 +36,12 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 
 - [set() command](command-set.md)
 - [get() command](command-get.md)
-- [check() command](command-check.md)
 - [copy() command](copy.md)
 - [delete() command](command-delete.md)
 - [rename() command](command-rename.md)
 - [move() command](command-move.md)
 - [spaces() command](command-spaces.md)
 - [keys() command](command-keys.md)
-- [values() command](command-values.md)
 - [info() command](command-info.md)
 - [memory() command](command-memory.md)
 - [stats() command](command-stats.md)

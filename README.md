@@ -2,7 +2,7 @@
 
 **Easy, Fast and Efficient MEMory NoSQL DataBase**
 
-**version 1.0.7**
+**version 1.0.8**
 
 <img src="EFEMemDB-icon.png" alt="EFEMem NoSQL Database" style="zoom:50%;" />
 
@@ -31,12 +31,14 @@ You can also run **EFEMem DB** on server side applications, using technologies b
 
 With a few and very easy commands, you can take the control of your data.
 
-```javascript
+```html
 // Web application example
-const { efemem } = require('path/efememdb.js');
+<script src="uri/efememdb.js"></script>
 
-let result = efemem.set("hello", "world");
-result = efemem.get("hello");
+<script>
+   let result = efemem.set("hello", "world");
+   result = efemem.get("hello");
+</script>
 ```
 
 
@@ -69,6 +71,7 @@ These are the main features of **EFEMem DB**:
 - **Persistence.** The data can be permantely saved (into **files** disk on server side, or into **localStorage** browser), and restore it when you want.
 - **NoSQL.** You don't need complex relationships between tables, or strict schemas. You use key-value pairs.
 - **Space names.** You can organize your keys using space names. You can use keys with the same name, but unique in different spaces.
+- **Pattern names.** You can access efficiently to many keys and spaces using pattern names, instead of accessing one by one.
 - **Rich data.** You can use different types of data:
   - integer numbers
   - float numbers
@@ -90,6 +93,7 @@ You can use this amazing data base in your **NodeJS**, as a complementary databa
 - Cycling logs.
 - Frequently data accessed. Caches.
 - IoT projects
+- Temporary data
 
 
 
@@ -102,6 +106,7 @@ You can use **EFEMem DB** in your web applications, without need to call remote,
 - Sessions management.
 - Local data managed exclusively by your web app.
 - HTML games
+- Temporary data
 
 
 
@@ -227,6 +232,14 @@ Each value is associated to an unique key. You can use different types of values
 
 
 
+### Pattern names
+
+Pattern name is a powerful feature of **EFEMem DB** than allows you to spread the scope of results of some commands. When you want to refer to a key or a space name, you can specify a part of the name, instead of the complete name. This part can be located at the begining, in the middle or at the end of the name (in any part of the name). If you don't specify any pattern (null or empty value), **EFEMem DB** will assume any name (all names).
+
+For example, you can save the info of the courses on spaces with their corresponding year: `course2016`, `course2017`, `course2018`, `course2019` and `course2020`. You can execute a command than affect to all the courses of the 10's decade, using as pattern name `'course201'` (this excludes `course2020`).
+
+
+
 ### Define keys and values
 
 You can define a key using this command:
@@ -260,6 +273,10 @@ efemem.set("califications", [4.5, 5.5, 6.2, 9, 7.3], "students");
 
 
 
+If the space and key existis previously, it will be updated with the new value.
+
+
+
 ### Retrieve a key and value
 
 You can retrieve a value through its key, using the following command:
@@ -269,8 +286,6 @@ efemem.get("language:en", "languages");
 ```
 
 
-
-The space name is optional, but is highly recommend its usage. If you don't use a space name, **EFEMem DB** assumes the `'public'` space name by default.
 
 
 
@@ -284,8 +299,6 @@ efemem.delete("language:en", "languages");
 
 
 
-The space name is optional, but is highly recommend its usage. If you don't use a space name, **EFEMem DB** assumes the `'public'` space name by default.
-
 
 
 ### List of spaces
@@ -297,6 +310,8 @@ If you want to remember the space names that you are using, simply execute the f
 ```javas
 efemem.spaces();
 ```
+
+
 
 
 
@@ -359,14 +374,14 @@ efemem.keys("course:002", "courses");
 
 You can retrieve the values filtering the keys in the same way you can do with the `keys()` command. 
 
-The `keys()` command and the `values()` command works in the same way. The difference is the result. `keys()` command returns the list of keys and space names, meanwhile `values()` command returns the full data about the value, key and space.
+The `get()` command returns the list of keys, values and space names.
 
 
 
 **Examples:**
 
 ```javascript
-result = efemem.keys("", "config");
+result = efemem.get("", "config");
 ```
 
 
@@ -374,64 +389,24 @@ result = efemem.keys("", "config");
 ```json
 result: {
   "ok": true,
-  "cmd": "keys()",
+  "cmd": "get(key[,space])",
   "data": [
     {
-      "space": "config",
-      "key": "maxValue"
+      "key": "config~maxValue",
+      "value": 100
     },
     {
-      "space": "config",
-      "key": "minValue"
+      "key": "config~minValue",
+      "value": 1
     }
   ],
-  "msg": "Keys for '' and space 'config' patterns retrieved successfully",
+  "msg": "2 values found",
   "affected": 2,
-  "time": "0s 0.071ms (71499 nanoseconds)"
+  "time": "1ms"
 }
 ```
 
 
-
-
-
-```javascript
-result = efemem.values("", "config");
-```
-
-
-
-```json
-result: {
-  "ok": true,
-  "cmd": "values()",
-  "data": [
-    {
-      "key": "maxValue",
-      "space": "config",
-      "value": {
-        "value": 100,
-        "due": "9999-12-31T22:59:59.000Z",
-        "updated": "2020-04-10T16:09:58.380Z",
-        "created": "2020-04-10T16:09:58.380Z"
-      }
-    },
-    {
-      "key": "minValue",
-      "space": "config",
-      "value": {
-        "value": 1,
-        "due": "9999-12-31T22:59:59.000Z",
-        "updated": "2020-04-10T16:09:58.381Z",
-        "created": "2020-04-10T16:09:58.381Z"
-      }
-    }
-  ],
-  "msg": "2 values found and retrieved for Key '' in space 'config'",
-  "affected": 2,
-  "time": "0s 0.713ms (713100 nanoseconds)"
-}
-```
 
 
 

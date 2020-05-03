@@ -8,16 +8,16 @@
 
 ## **Parameters**
 
-| Parameter | Type   | Mandatory | Description                     |
-| --------- | ------ | --------- | ------------------------------- |
-| `key`     | string | Yes       | Key name                        |
-| `space`   | string | No        | Space name. 'public' by default |
+| Parameter | Type   | Mandatory | Description                             |
+| --------- | ------ | --------- | --------------------------------------- |
+| `key`     | string | Yes       | Key name pattern                        |
+| `space`   | string | No        | Space name pattern. 'public' by default |
 
 
 
 ## **Description**
 
-The `delete()` command removes a given key and its value from a given space name.
+The `delete()` command removes the keys and their values from a given space name. according to a [pattern name](patterns.md).
 
 
 
@@ -26,7 +26,7 @@ The `delete()` command removes a given key and its value from a given space name
 This example will create some keys and values:
 
 ```javascript
-const { efemem } = require('./efememdb.js');
+const { efemem } = require('efememdb');
 
 let result = efemem.set("maxValue", 100, "config");
 result = efemem.set("minValue", 1, "config");
@@ -40,11 +40,11 @@ The following code shows you how `delete()` command works:
 
 ```javascript
 // before
-result = efemem.values("", "students");
+result = efemem.get("", "students");
 // delete
 result = efemem.delete("student:001", "students");
 // after
-result = efemem.values("", "students");
+result = efemem.get("", "students");
 ```
 
 
@@ -54,11 +54,10 @@ The first result shows you the existence of the student key at the `students` sp
 ```javascript
 result before: {
   "ok": true,
-  "cmd": "values()",
+  "cmd": "get(key[,space])",
   "data": [
     {
-      "key": "student:001",
-      "space": "students",
+      "key": "student:001~students",
       "value": {
         "name": "James",
         "surname": "Gordon",
@@ -66,7 +65,7 @@ result before: {
       }
     }
   ],
-  "msg": "1 values found and retrieved for Key '' in space 'students'",
+  "msg": "1 values found",
   "affected": 1,
   "time": "0s 0.504ms (503800 nanoseconds)"
 }
@@ -77,18 +76,12 @@ result before: {
 ```javascript
 result delete: {
   "ok": true,
-  "cmd": "delete()",
-  "key": "student:001",
-  "space": "students",
-  "value": {
-    "name": "James",
-    "surname": "Gordon",
-    "job": "Police inspector"
+  "cmd": "delete(key[,space])",
+  "data": {
+    "key": "student:001",
+    "space": "students"
   },
-  "due": "9999-12-31T22:59:59.000Z",
-  "created": "2020-04-10T14:24:22.584Z",
-  "updated": "2020-04-10T14:24:22.584Z",
-  "msg": "Key 'student:001' in space 'students' deleted successfully",
+  "msg": "1 keys deleted",
   "affected": 1,
   "time": "0s 0.709ms (708599 nanoseconds)"
 }
@@ -99,9 +92,9 @@ result delete: {
 ```javascript
 result after: {
   "ok": true,
-  "cmd": "values()",
-  "data": {},
-  "msg": "No values found for key '' in space 'students'",
+  "cmd": "get(key[,space])",
+  "data": [],
+  "msg": "0 values found",
   "affected": 0,
   "time": "0s 0.044ms (44500 nanoseconds)"
 }
@@ -109,10 +102,31 @@ result after: {
 
 
 
+The following commands will delete all the keys from `'students'` space:
+
+```javascript
+result = efemem.delete("*", "students");
+result = efemem.delete("", "students");
+result = efemem.delete(null, "students");
+```
+
+
+
+The following command will delete all the keys from `'public'` space  (if no space provided, it will `'public'` by default):
+
+```javascript
+result = efemem.delete();
+```
+
+
+
+
+
 ## **See also**
 
 - [Keys](keys.md)
 - [Spaces](spaces.md)
+- [Pattern names](patterns.md)
 - [copy() command](command-copy.md)
 - [move() command](command-move.md)
 - [rename() command](command-rename.md)

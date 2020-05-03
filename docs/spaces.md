@@ -40,6 +40,7 @@ Incorrect space names could be the following:
 
 - [Keys](keys.md)
 - [Values](values.md)
+- [Pattern names](patterns.md)
 - [spaces() command](command-spaces.md)
 
 

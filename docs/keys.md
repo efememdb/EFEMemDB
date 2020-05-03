@@ -46,6 +46,7 @@ Incorrect key names example are the following:
 
 - [Spaces](spaces.md)
 - [Values](values.md)
+- [Pattern names](patterns.md)
 - [keys() command](command-keys.md)
 
 

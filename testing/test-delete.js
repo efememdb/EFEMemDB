@@ -26,55 +26,55 @@ const evaluate = (title, result, expected) => {
   }
 };
 
-// Testing if error. delete() without parameters
-result = efemem.delete();
-evaluate(`delete()`, result, false);
+// Testing delete() without parameters. Deletes all keys (*) from 'public' space
+//result = efemem.delete();
+//evaluate(`delete() ('*', 'public' by default)`, result, true);
 
-// Testing if error. delete() with incorrect key (null)
-result = efemem.delete(null);
-evaluate(`delete(null)`, result, false);
+// // Testing delete() with null param. Deletes all keys (*) from 'public' space (0 deleted)
+//result = efemem.delete(null);
+//evaluate(`delete(null)`, result, true);
 
-// Testing if error. delete() with incorrect key (no string name)
+//  Testing delete(). 123 value not found (0 deleted)
 result = efemem.delete(123);
-evaluate(`delete(123)`, result, false);
+evaluate(`delete(123)`, result, true);
 
-// Testing if error. delete() with incorrect key (first character not alphabetical)
+// Testing delete(). "1abc" value not found (0 deleted)
 result = efemem.delete("1abc");
-evaluate(`delete("1abc")`, result, false);
+evaluate(`delete("1abc")`, result, true);
 
-// Testing if error. delete() with incorrect key (illegal character)
+// Testing delete(). "maxValue!" not found  (0 deleted)
 result = efemem.delete("maxValue!");
-evaluate(`delete("maxValue!")`, result, false);
+evaluate(`delete("maxValue!")`, result, true);
 
-// Testing if error. delete() with incorrect key (More than 100 characters)
+// Testing delete() with value not found (0 deleted)
 result = efemem.delete(
   "maxValueqweiutyqw573456y23478tyqweiutyqewi57832465897346tr87wqyetiuqweyt2347856234875yt6iequwyteiqwuty34896723"
 );
 evaluate(
   `delete("maxValueqweiutyqw573456y23478tyqweiutyqewi57832465897346tr87wqyetiuqweyt2347856234875yt6iequwyteiqwuty34896723")`,
   result,
-  false
+  true
 );
 
-// Testing if error. delete() with incorrect space (first character not alphabetical)
+// Testing delete() with space not found (first character not alphabetical)
 result = efemem.delete("maxValue", "1abc");
-evaluate(`delete("maxValue", "1abc")`, result, false);
+evaluate(`delete("maxValue", "1abc")`, result, true);
 
-// Testing if error. delete() with incorrect space (illegal character)
+// Testing delete() with space not found (illegal character)
 result = efemem.delete("maxValue", "config!");
-evaluate(`delete("maxValue", "config!")`, result, false);
+evaluate(`delete("maxValue", "config!")`, result, true);
 
-// Testing if error. delete() with incorrect space (more than 24 characters)
+// Testing delete() with space not found (more than 24 characters)
 result = efemem.delete("maxValue", 100, "configiu09olki87ujhy65tgf");
-evaluate(`delete("maxValue", 100, "configiu09olki87ujhy65tgf")`, result, false);
+evaluate(`delete("maxValue", 100, "configiu09olki87ujhy65tgf")`, result, true);
 
-// Testing if error. delete() with an existing key, but not in the 'public' space
+// Testing delete() with an existing key, but not in the 'public' space (0 deleted)
 result = efemem.delete("maxValue");
-evaluate(`delete("maxValue")`, result, false);
+evaluate(`delete("maxValue")`, result, true);
 
-// Testing if error. delete() a non existing key
+// Testing delete() a non existing key (0 deleted)
 result = efemem.delete("employee:009", "employees");
-evaluate(`delete("employee:009", "employees")`, result, false);
+evaluate(`delete("employee:009", "employees")`, result, true);
 
 // Testing. delete() an existing key
 result = efemem.delete("job", "employees");

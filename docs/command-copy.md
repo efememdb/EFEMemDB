@@ -2,7 +2,7 @@
 
 ## **Syntax** 
 
-`move(key, space, newKey, newSpace)`
+`move(key, space, newSpace)`
 
 
 
@@ -10,22 +10,25 @@
 
 | Parameter  | Type   | Mandatory | Description                                         |
 | ---------- | ------ | --------- | --------------------------------------------------- |
-| `key`      | string | Yes       | Key name                                            |
-| `space`    | string | Yes       | Space name (origin)                                 |
-| `newKey`   | string | No        | New key name (destination). `key`  param by default |
+| `key`      | string | Yes       | Key name pattern                                    |
+| `space`    | string | Yes       | Space name pattern (origin).                        |
 | `newSpace` | string | No        | New space name (destination). `'public'` by default |
 
 
 
 ## **Description**
 
-The `copy()`  command copies a given key from an existing space name (origin) to another key and/or space name (destination). 
+The `copy()`  command copies the keys found in the origin spaces according to a [pattern](patterns.md), to another space name (destination). 
 
-If destination key name is not provided, origin key value will be assumed.
+If no *key* specified, all keys will be assumed (use pattern name).
 
-If destination space name is not provided, `'public'` space will be assumed by default.
+If no (origin) *space* specified, all spaces will be assumed (use pattern name).
 
-If destination space name is non-existent, a new space name will be created.
+If no (destination) *newSpace* name is not provided, `'public'` space will be assumed by default.
+
+If (destination) *newSpace* name is non-existent, a new space name will be created. 
+
+If *key* exists and (destination) *newSpace* exists, the value will be overwritten with the same value as the origin *key* and *space*.
 
 
 
@@ -34,14 +37,14 @@ If destination space name is non-existent, a new space name will be created.
 This example will create one key and its value:
 
 ```javascript
-const { efemem } = require('./efememdb.js');
+const { efemem } = require('efememdb');
 
 let result = efemem.set("salary", 1234.56, "employees");
 ```
 
 
 
-The following command will copy this key from `'employees'` space to `'public'` space (it will be assumed by default):
+The following command will copy the `'salary'` key from `'employees'` space to `'public'` space (keep attention to no *newSpace* was specified, and `'public'` will be assumed by default):
 
 ```javascript
 result = efemem.copy("salary", "employees");
@@ -52,7 +55,7 @@ result = efemem.copy("salary", "employees");
 To check the result, the next command will get the keys with pattern `'salary'` from any space:
 
 ```javascript
-result = efemem.values("salary");
+result = efemem.get("salary");
 ```
 
 
@@ -60,31 +63,43 @@ result = efemem.values("salary");
 This is the result:
 
 ```javascript
-'keys "salary"' values: {
+result: {
   "ok": true,
-  "cmd": "values()",
+  "cmd": "get(key[,space])",
   "data": [
     {
-      "key": "salary",
-      "space": "public",
+      "key": "salary~public",
       "value": 1234.56,
-      "created": "2020-04-19T16:21:11.789Z",
-      "updated": "2020-04-19T16:21:11.789Z",
-      "due": "9999-12-31T22:59:59.000Z"
     },
     {
-      "key": "salary",
-      "space": "employees",
+      "key": "salary~employees",
       "value": 1234.56,
-      "created": "2020-04-19T16:21:11.789Z",
-      "updated": "2020-04-19T16:21:11.789Z",
-      "due": "9999-12-31T22:59:59.000Z"
     }
   ],
-  "msg": "2 values found and retrieved for Key 'salary' in space '*'",
+  "msg": "2 values found",
   "affected": 2,
   "time": "< 1 ms"
 }
+```
+
+
+
+The following commands will copy all the keys from `'config'` space to `'configBackup'` space:
+
+```javascript
+result = efemem.copy("*", "config", "configBackup");
+result = efemem.copy("", "config", "configBackup");
+result = efemem.copy(null, "config", "configBackup");
+```
+
+
+
+The following commands will copy all the keys from any space to `'backup'` space:
+
+```javascript
+result = efemem.copy("*", "*", "backup");
+result = efemem.copy("", "", "backup");
+result = efemem.copy(null, null, "backup");
 ```
 
 
@@ -95,6 +110,7 @@ This is the result:
 
 - [Keys](keys.md)
 - [Spaces](spaces.md)
+- [Pattern names](patterns.md)
 - [move() command](command-move.md)
 - [rename() command](command-rename.md)
 - [delete() command](command-delete.md)

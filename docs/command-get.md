@@ -2,22 +2,23 @@
 
 ## **Syntax** 
 
-`get(key, space)`
+`get(key, space[,fullInfo])`
 
 
 
 ## **Parameters**
 
-| Parameter | Type   | Mandatory | Description                     |
-| --------- | ------ | --------- | ------------------------------- |
-| `key`     | string | Yes       | Key name                        |
-| `space`   | string | No        | Space name. 'public' by default |
+| Parameter  | Type    | Mandatory | Description                                                  |
+| ---------- | ------- | --------- | ------------------------------------------------------------ |
+| `key`      | string  | No        | Key name pattern                                             |
+| `space`    | string  | No        | Space name pattern                                           |
+| `fullInfo` | boolean | No        | If `false` (by default), it will return a minimal info overresult. If `true`,  it will return a complete information over result. |
 
 
 
 ## **Description**
 
-The `get()` command retrieves a value from a given key name from a given space name. 
+The `get()` command retrieves the values associated to the keys from the spaces specified as [pattern](patterns.md) names. 
 
 
 
@@ -26,7 +27,7 @@ The `get()` command retrieves a value from a given key name from a given space n
 This example will create and retrieve a valid key:
 
 ```javascript
-const { efemem } = require('./efememdb.js');
+const { efemem } = require('efememdb');
 
 let result = efemem.set("maxValue", 100, "config");
 result = efemem.get("maxValue", "config")
@@ -39,51 +40,57 @@ This result will be the next:
 ```javascript
 result: {
   "ok": true,
-  "cmd": "get()",
-  "data": {
+  "cmd": "get(key[,space])",
+  "data": [
+    "key": "config~maxValue",
     "value": 100,
-    "due": "9999-12-31T23:59:59.000Z",
-    "updated": "2020-04-10T12:18:55.509Z",
-    "created": "2020-04-10T12:18:55.509Z"
-  },
-  "msg": "Key 'maxValue' in space 'config' found and retrieved successfully",
+  ],
+  "msg": "1 values found",
   "affected": 1,
-  "time": "0s 0.352ms (351799 nanoseconds)"
+  "time": "<1ms"
 }
 ```
 
 
 
-This example will provoke an error, because you are creating the key in the `'config'` space name, and you are trying to get the key from the `'public'` space name (by default):
+The following command will get the complete information about all the keys with pattern 'maxValue' on any space:
 
 ```javascript
-const { efemem } = require('./efememdb.js');
-
-let result = efemem.set("maxValue", 100, "config");
-result = efemem.get("maxValue")
+result = efemem.get("maxValue", "config", true);
 ```
 
 
 
-The previous code will generate the following result:
+The result will be the following one:
 
 ```javascript
-result: {  
-   "ok": false,  
-   "cmd": "get(key[,space])",  
-   "msg": "Error: key 'maxValue' in space 'public' not found",  
-} 
+result: {
+  "ok": true,
+  "cmd": "get(key[,space])",
+  "data": [
+    "space": "config",
+    "key": "maxValue",
+    "data": {
+       "value": 100,
+       "due": "2020-05-03T20:05:46Z436"
+     }
+  ],
+  "msg": "1 values found",
+  "affected": 1,
+  "time": "1ms"
+}
 ```
+
+
 
 
 
 ## See also
 
-- [check() command](command-check.md)
-- [values() command](command-values.md)
 - [Keys](keys.md)
 - [Spaces](spaces.md)
 - [Values](values.md)
+- [Pattern names](patterns.md)
 
 
 

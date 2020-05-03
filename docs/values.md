@@ -29,8 +29,8 @@ Some values examples:
 
 - [Keys](keys.md)
 - [Spaces](spaces.md)
+- [Pattern names](patterns.md)
 - [get() command](command-get.md)
-- [values() command](command-values.md)
 
 
 

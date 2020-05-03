@@ -8,13 +8,18 @@
 
 ## **Parameters**
 
-N/A
+| Parameter | Type   | Mandatory | Description        |
+| --------- | ------ | --------- | ------------------ |
+| `key`     | string | No        | Key name pattern   |
+| `space`   | string | No        | Space name pattern |
+
+
 
 
 
 ## **Description**
 
-The `stats()` command calculate statistics over numeric values in the keys that matches with the `key` and `space` patterns.
+The `stats()` command calculate statistics over numeric values in the keys that matches with the `key` and `space` [patterns](patterns.md).
 
 The statistics includes:
 
@@ -130,6 +135,7 @@ The result will be the following one:
 - [Keys](keys.md)
 - [Spaces](spaces.md)
 - [Values](values.md)
+- [Pattern names](patterns.md)
 
 
 

@@ -51,7 +51,7 @@ The result could be the following one:
 ```json
 result: {
   "ok": true,
-  "cmd": "spaceInfo()",
+  "cmd": "spaceInfo([space])",
   "data": {
     "space": "qualifications",
     "keys": 10,
