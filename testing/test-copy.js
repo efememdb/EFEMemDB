@@ -27,12 +27,12 @@ const evaluate = (title, result, expected) => {
 };
 
 // Testing if error. copy() without parameters
-result = efemem.copy();
-evaluate(`copy()`, result, false);
+//result = efemem.copy();
+//evaluate(`copy()`, result, false);
 
 // Testing if error. copy() with incorrect key (null)
-result = efemem.copy(null);
-evaluate(`copy(null)`, result, false);
+//result = efemem.copy(null);
+//evaluate(`copy(null)`, result, false);
 
 // Testing if error. copy() with incorrect key (no string name)
 result = efemem.copy(123);
@@ -92,49 +92,28 @@ evaluate(
   false
 );
 
-// Testing if error. copy() with incorrect destination space (no string name)
-result = efemem.copy("salary", "public", "payment", 123);
-evaluate(`copy("salary", "public", "payment", 123)`, result, false);
+// Testing copy() with same origin and destination keys (overwrite by default false)
+result = efemem.copy("salary", "public", "public");
+evaluate(`copy("salary", "public", "public")`, result, true);
 
-// Testing if error. copy() with incorrect destination space (first character not alphabetical)
-result = efemem.copy("salary", "public", "payment", "1abc");
-evaluate(`copy("salary", "public", "payment", "1abc")`, result, false);
-
-// Testing if error. copy() with incorrect destination space (illegal character)
-result = efemem.copy("salary", "public", "payment", "maxValue!");
-evaluate(`copy("salary", "public", "payment", "maxValue!")`, result, false);
-
-// Testing if error. copy() with incorrect destination key (More than 100 characters)
-result = efemem.copy(
-  "salary",
-  "public",
-  "payment",
-  "configiu09olki87ujhy65tgf"
-);
-evaluate(
-  `copy("salary, "public", "payment", "configiu09olki87ujhy65tgf")`,
-  result,
-  false
-);
-
-// Testing if error. copy() with same origin and destination keys
-result = efemem.copy("salary", "public", "salary", "public");
-evaluate(`copy("salary", "public", "salary", "public")`, result, false);
-
-// Testing if error. copy() with same origin and destination keys ('public' by default)
-result = efemem.copy("salary", "public", "salary");
-evaluate(`copy("salary", "public", "salary")`, result, false);
-
-// Testing if error. copy() with same origin and destination keys ('public' by default)
-result = efemem.copy("salary", "public");
-evaluate(`copy("salary", "public")`, result, false);
+// Testing copy() with same origin and destination keys ('public' by default and overwrite false)
+result = efemem.copy("salary");
+evaluate(`copy("salary", "public")`, result, true);
 
 // Testing. copy () success. Copy with same key into other space
-result = efemem.copy("salary", "public", "", "employees");
+result = efemem.copy("salary", "public", "employees");
 evaluate(`copy("salary", "public", "", "employees")`, result, true);
-
-result = efemem.values("salary");
 console.log(`result: ${JSON.stringify(result, null, 2)}`);
+
+result = efemem.get("salary");
+console.log(`result: ${JSON.stringify(result, null, 2)}`);
+
+// ONLY FOR EXPLICIT TESTING PURPOSES
+// Copy all keys to 'public' space
+//efemem.set("salary", 9876.432, "employees");
+//result = efemem.copy();
+//evaluate(`copy("salary", "public", "", "employees")`, result, true);
+//console.log(`result: ${JSON.stringify(result, null, 2)}`);
 
 console.log("\n-------------------------------------");
 console.log(`OK: ${ok} vs KO: ${ko}`);

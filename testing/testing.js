@@ -1,9 +1,7 @@
 require("./test-set");
 require("./test-get");
-require("./test-check");
 require("./test-spaces");
 require("./test-keys");
-require("./test-values");
 require("./test-rename");
 require("./test-move");
 require("./test-copy");

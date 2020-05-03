@@ -40,7 +40,7 @@ The following commands changes the name of the key with a new student:
 
 ```javascript
 result = efemem.rename("student:001", "student:007", "students");
-result = efemem.values("", "students");
+result = efemem.get("", "students");
 ```
 
 
@@ -51,7 +51,7 @@ Here are the results:
 rename result: 
 {
   "ok": true,
-  "cmd": "rename()",
+  "cmd": "rename(key, newKey[, space])",
   "data": {
     "name": "James",
     "surname": "Gordon",
@@ -59,21 +59,20 @@ rename result:
   },
   "msg": "Key 'student:001' at space 'students' was renamed as 'student:007'",
   "affected": 1,
-  "time": "0s 0.291ms (291500 nanoseconds)"
+  "time": "<1ms"
 }
 ```
 
 
 
 ```javascript
-values result: 
+result: 
 {
   "ok": true,
-  "cmd": "values()",
+  "cmd": "get(key[,space])",
   "data": [
     {
-      "key": "student:007",
-      "space": "students",
+      "key": "students~student:007",
       "value": {
         "name": "James",
         "surname": "Gordon",
@@ -81,9 +80,9 @@ values result:
       }
     }
   ],
-  "msg": "1 values found and retrieved for Key '' in space 'students'",
+  "msg": "1 values found",
   "affected": 1,
-  "time": "0s 0.728ms (727800 nanoseconds)"
+  "time": "<1ms"
 }
 ```
 

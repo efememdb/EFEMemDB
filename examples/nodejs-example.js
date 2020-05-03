@@ -59,7 +59,7 @@ result = efemem.keys("", "config"); // All the keys from 'config' space
 console.log(`'config' keys: ${JSON.stringify(result, null, 2)}`);
 
 // Get values of the keys from '*emp*' space (employees)
-result = efemem.values("", "emp");
+result = efemem.get("", "emp");
 console.log(`'*emp*' values: ${JSON.stringify(result, null, 2)}`);
 
 // rename 'employee:001' to 'employee:007'
@@ -69,13 +69,13 @@ console.log(`'Rename:' values: ${JSON.stringify(result, null, 2)}`);
 // Move key 'salary' to 'public' space
 result = efemem.move("salary", "employees");
 console.log(`Move: ${JSON.stringify(result, null, 2)}`);
-result = efemem.values("", "public");
+result = efemem.get("", "public");
 console.log(`values: ${JSON.stringify(result, null, 2)}`);
 
 // Copy key 'salary' from 'public' space to 'employees' space
 result = efemem.copy("salary", "public", "salary", "employees");
 console.log(`copy: ${JSON.stringify(result, null, 2)}`);
-result = efemem.values("salary");
+result = efemem.get("salary");
 console.log(`'keys "salary"' values: ${JSON.stringify(result, null, 2)}`);
 
 // Delete key 'job' from 'employees' space
@@ -90,7 +90,7 @@ result = efemem.spaces();
 console.log(`Spaces: ${JSON.stringify(result, null, 2)}`);
 result = efemem.keys(); // All the keys
 console.log(`Keys: ${JSON.stringify(result, null, 2)}`);
-result = efemem.values();
+result = efemem.get();
 console.log(`values: ${JSON.stringify(result, null, 2)}`);
 console.log(`info: ${JSON.stringify(efemem.info(), null, 2)}`);
 
@@ -107,7 +107,7 @@ result = efemem.restore();
 console.log(`restore: ${JSON.stringify(result, null, 2)}`);
 
 // Values
-result = efemem.values();
+result = efemem.get();
 console.log(`values: ${JSON.stringify(result, null, 2)}`);
 
 // Prepare data for statistics

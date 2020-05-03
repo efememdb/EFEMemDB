@@ -17,7 +17,7 @@
 
 ## **Description**
 
-The `keys()` command retrieves a list of key names, based on a pattern key or/and a pattern space. The pattern is, simply, a set of characters, which could be located on any position in the name of the key or the space.
+The `keys()` command retrieves a list of key names, based on a pattern key name and a pattern space name. The pattern is, simply, a set of characters, which could be located on any position in the name of the key or the space.
 
 If no pattern is passed as parameter, will assume all the keys or spaces. You can also use the asterisc character (*) as pattern for all keys or spaces.
 
@@ -28,9 +28,7 @@ If no pattern is passed as parameter, will assume all the keys or spaces. You ca
 The following code will create some keys:
 
 ```javascript
-const { efemem } = require('./efememdb.js');
-
-
+const { efemem } = require('efememdb');
 
 let result = efemem.set("maxValue", 100, "config");
 result = efemem.set("minValue", 1, "config");
@@ -76,7 +74,7 @@ result: {
       "key": "student:001"
     }
   ],
-  "msg": "Keys for '' and space '' patterns retrieved successfully",
+  "msg": "4 Keys retrieved",
   "affected": 4,
   "time": "0s 0.008ms (7600 nanoseconds)"
 }
@@ -222,6 +220,7 @@ result: {
 - [Keys](keys.md)
 - [Spaces](spaces.md)
 - [Values](values.md)
+- [Pattern names](patterns.md)
 
 
 

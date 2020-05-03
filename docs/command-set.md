@@ -8,12 +8,12 @@
 
 ## **Parameters**
 
-| Parameter | Type                                  | Mandatory | Description                                              |
-| --------- | ------------------------------------- | --------- | -------------------------------------------------------- |
-| `key`     | string                                | Yes       | Key name                                                 |
-| `value`   | number, string, boolean, array object | Yes       | Value                                                    |
-| `space`   | string                                | No        | Space name. 'public' by default                          |
-| `due`     | number                                | No        | Due time seconds. By default, the key will never expire. |
+| Parameter | Type                                  | Mandatory | Description                                                  |
+| --------- | ------------------------------------- | --------- | ------------------------------------------------------------ |
+| `key`     | string                                | No        | Key name. If it is not specified, EFEMem DB will generate a 24 characters hash name automatically |
+| `value`   | number, string, boolean, array object | Yes       | Value                                                        |
+| `space`   | string                                | No        | Space name. 'public' by default                              |
+| `due`     | number                                | No        | Due time seconds. By default, the key will never expire.     |
 
 
 
@@ -55,57 +55,54 @@ set("maxValue", 100, "config", 30);  // 30 seconds key life
 
 
 
+
+
 ## **Examples**
 
 This example will create a valid key into the `config` space name, with a time expiration of 30 seconds:
 
 ```javascript
-const { efemem } = require('./efememdb.js');
+const { efemem } = require('efememdb');
 
 let result = efemem.set("maxValue", 100, "config", 30);
 ```
 
 
 
-This code will print the following result:
+The following example will provoke an error, because the first character of the key name must be an alphabetical character (not a number):
 
 ```javascript
-result: {  
-   "ok": true,  
-   "cmd": "set()",  
-   "data": {    
-      "value": 100,    
-      "due": "2020-04-10T11:44:00.896Z",    
-      "updated": "2020-04-10T11:43:30.896Z",    
-      "created": "2020-04-10T11:43:30.896Z"  
-   },  
-   "msg": "Key 'maxValue' saved successfully in space 'config'",  
-   "affected": 1,  
-   "time": "0s 1.098ms (1098099 nanoseconds)" 
-} 
-```
-
-
-
-The following example will provoke an error:
-
-```javascript
-const { efemem } = require('./efememdb.js');
-
 let result = efemem.set("7maxValue", 100, "config", 30);
 ```
 
 
 
-This code will print the following result:
+If you don't specify a key, **EFEMem DB** will generate a hash key automatically, that assure the uniqueness of the key.
 
 ```javascript
-result: {
-  "ok": false,
-  "cmd": "set()",
-  "data": 100,
-  "msg": "Error on key: '7maxValue' name is incorrect. First character must be alphabetical",
-  "affected": 0
+efemem.set("", 100);
+efemem.set(null, 100);
+```
+
+
+
+The result will be following:
+
+```JSON
+{
+  "ok": true,
+  "cmd": "set(key, value[,space[,due]])",
+  "data": {
+    "key": "EFE07E4041A160E12038D812",
+    "space": "public",
+    "value": 100,
+    "due": "9999-12-31T22:59:59.000Z",
+    "updated": "2020-04-26T22:14:18.909Z",
+    "created": "2020-04-26T22:14:18.909Z"
+  },
+  "msg": "Key 'EFE07E4041A160E12038D812' saved successfully in space 'public'",
+  "affected": 1,
+  "time": "< 1 ms"
 }
 ```
 

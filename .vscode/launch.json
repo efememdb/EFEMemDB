@@ -10,15 +10,21 @@
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}\\examples\\nodejs-example.js"
-    }
-
-    /*
+    } /*
     {
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}\\testing\\testing.js"
+    }
+    
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}\\efememdb.js"
     }*/
   ]
 }

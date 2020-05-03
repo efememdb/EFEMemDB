@@ -73,11 +73,11 @@
         document.getElementById("keys").innerHTML = content;
 
         // Get values of the keys from '*emp*' space (employees)
-        result = efemem.values("", "emp");
+        result = efemem.get("", "emp");
         console.log(`'*emp*' values: ${JSON.stringify(result, null, 2)}`);
 
         document.getElementById("values").innerHTML =
-          "<h2>values()</h2><p><code>" +
+          "<h2>get()</h2><p><code>" +
           JSON.stringify(result, null, 2) +
           "</code><p>";
 
@@ -97,7 +97,7 @@
         content +=
           "<p><code>" + JSON.stringify(result, null, 2) + "</code></p>";
 
-        result = efemem.values("", "public");
+        result = efemem.get("", "public");
         console.log(`'public' values: ${JSON.stringify(result, null, 2)}`);
         content +=
           "<p><code>" + JSON.stringify(result, null, 2) + "</code></p>";
@@ -111,7 +111,7 @@
         content +=
           "<p><code>" + JSON.stringify(result, null, 2) + "</code></p>";
 
-        result = efemem.values("salary");
+        result = efemem.get("salary");
         console.log(`'salary' values: ${JSON.stringify(result, null, 2)}`);
         content +=
           "<p><code>" + JSON.stringify(result, null, 2) + "</code></p>";
@@ -143,7 +143,7 @@
         content +=
           "<h3>keys</h3><code>" + JSON.stringify(result, null, 2) + "</code>";
 
-        result = efemem.values();
+        result = efemem.get();
         console.log(`values: ${JSON.stringify(result, null, 2)}`);
         content +=
           "<h3>values</h3><code>" + JSON.stringify(result, null, 2) + "</code>";
@@ -210,12 +210,10 @@
           JSON.stringify(result, null, 2) +
           "</code>";
 
-        result = efemem.values();
+        result = efemem.get();
         console.log(`values: ${JSON.stringify(result, null, 2)}`);
         document.getElementById("values2").innerHTML =
-          "<h2>values()</h2><code>" +
-          JSON.stringify(result, null, 2) +
-          "</code>";
+          "<h2>get()</h2><code>" + JSON.stringify(result, null, 2) + "</code>";
       }
     </script>
 
